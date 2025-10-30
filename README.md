@@ -179,6 +179,6 @@ If you need help:
 
 ---
 
-**Made with ❤️ by MiniMax Agent**
+**Made with ❤️ by zeroday**
 
 *Subscribe to suffer* - The game that breaks spirits and builds legends.
