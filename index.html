@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Hell's Gauntlet: Impossible Ascent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="The most brutal platformer ever created. Prepare to suffer.">
+    <meta name="keywords" content="impossible game, platformer, difficult game, level devil, hardcore gaming">
+    <meta property="og:title" content="Hell's Gauntlet: Impossible Ascent">
+    <meta property="og:description" content="The most brutal platformer ever created. Are you brave enough?">
+    <meta property="og:type" content="game">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="background-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Hell's Gauntlet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
+</head>
+<body class="bg-black text-red-500 font-mono overflow-hidden select-none">
+    <div id="game-container" class="relative w-full h-screen">
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full touch-none"></canvas>
+        
+        <!-- Game UI -->
+        <div class="absolute top-0 left-0 right-0 p-2 sm:p-4 flex justify-between items-center z-20">
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <span id="deaths-counter" class="text-sm sm:text-xl font-bold">Deaths: 0</span>
+                <span id="time-counter" class="text-sm sm:text-xl font-bold">Time: 0:00</span>
+                <span id="level-indicator" class="text-xs sm:text-sm text-yellow-400 hidden sm:block">Level: 1</span>
+            </div>
+            <button id="pause-btn" class="px-2 py-1 sm:px-4 sm:py-2 bg-red-900 rounded-lg hover:bg-red-700 transition-colors touch-manipulation">
+                <i data-feather="pause" class="w-4 h-4 sm:w-6 sm:h-6"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div id="mobile-controls" class="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 sm:hidden">
+            <!-- Left movement controls -->
+            <div class="flex space-x-2">
+                <button id="left-btn" class="w-16 h-16 bg-red-800 bg-opacity-80 rounded-full border-2 border-red-600 flex items-center justify-center touch-manipulation active:bg-red-600">
+                    <i data-feather="chevron-left" class="w-8 h-8 text-white"></i>
+                </button>
+                <button id="right-btn" class="w-16 h-16 bg-red-800 bg-opacity-80 rounded-full border-2 border-red-600 flex items-center justify-center touch-manipulation active:bg-red-600">
+                    <i data-feather="chevron-right" class="w-8 h-8 text-white"></i>
+                </button>
+            </div>
+            
+            <!-- Jump button -->
+            <button id="jump-btn" class="w-20 h-20 bg-yellow-600 bg-opacity-80 rounded-full border-2 border-yellow-400 flex items-center justify-center touch-manipulation active:bg-yellow-500">
+                <i data-feather="arrow-up" class="w-10 h-10 text-white"></i>
+            </button>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-95 z-10 p-4">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl sm:text-6xl font-bold text-red-600 mb-4 animate-pulse">HELL'S GAUNTLET</h1>
+                <p class="text-lg sm:text-2xl mb-8 text-red-400">The Impossible Ascent</p>
+                <p class="text-sm sm:text-base text-red-300 mb-4">🎮 Desktop: Arrow Keys + Space</p>
+                <p class="text-sm sm:text-base text-red-300 mb-8">📱 Mobile: Use on-screen controls</p>
+            </div>
+            
+            <button id="start-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-red-800 text-lg sm:text-2xl rounded-lg hover:bg-red-600 active:bg-red-700 transition-all duration-200 mb-4 touch-manipulation">
+                BEGIN YOUR SUFFERING
+            </button>
+            
+            <div class="p-3 sm:p-4 bg-red-900 bg-opacity-60 rounded-lg max-w-sm text-center mb-4">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base">⚠️ WARNING: IMPOSSIBLY DIFFICULT</p>
+                <p class="text-xs sm:text-sm mt-2">Designed to break your spirit and sanity</p>
+            </div>
+
+            <div class="neon-blood-box">
+                <p class="neon-text text-xs sm:text-sm">Made by MiniMax Agent</p>
+            </div>
+        </div>
+
+        <!-- Death Screen -->
+        <div id="death-screen" class="absolute inset-0 hidden flex-col items-center justify-center bg-black bg-opacity-95 z-10 p-4">
+            <div class="text-center mb-4">
+                <h1 class="text-4xl sm:text-6xl font-bold text-red-600 mb-4 animate-bounce">💀 YOU DIED 💀</h1>
+                <p class="text-lg sm:text-xl mb-4 text-red-400">Attempt: <span id="death-count">0</span></p>
+                <p class="text-base sm:text-lg mb-8 text-red-300">Time: <span id="death-time">0:00</span></p>
+            </div>
+            
+            <button id="retry-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-red-800 text-lg sm:text-xl rounded-lg hover:bg-red-600 active:bg-red-700 transition-all duration-200 mb-4 touch-manipulation">
+                TRY AGAIN (MORTAL)
+            </button>
+            
+            <button id="save-btn" class="px-4 py-2 bg-green-800 text-sm rounded-lg hover:bg-green-600 mb-4 touch-manipulation">
+                💾 SAVE CHECKPOINT
+            </button>
+
+            <!-- AdSense Ad -->
+            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center mb-4">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2">🎮 SUPPORT THE DEVELOPER</p>
+                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <p class="text-xs text-gray-400 mt-2">Ad helps keep the game free!</p>
+            </div>
+
+            <div class="p-3 sm:p-4 bg-red-900 bg-opacity-60 rounded-lg max-w-sm text-center">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base">💀 STATS TRACKING</p>
+                <p class="text-xs sm:text-sm mt-2">Your deaths fuel the game engine!</p>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="absolute inset-0 hidden flex-col items-center justify-center bg-black bg-opacity-95 z-10 p-4">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl sm:text-6xl font-bold text-red-600 mb-8">⏸️ PAUSED</h1>
+            </div>
+            
+            <button id="resume-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-green-800 text-lg sm:text-xl rounded-lg hover:bg-green-600 active:bg-green-700 transition-all duration-200 mb-4 touch-manipulation">
+                RESUME
+            </button>
+            
+            <button id="quit-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-gray-800 text-lg sm:text-xl rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all duration-200 mb-8 touch-manipulation">
+                GIVE UP
+            </button>
+
+            <div class="p-3 sm:p-4 bg-red-900 bg-opacity-60 rounded-lg max-w-sm text-center">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base">🎮 GAME INFO</p>
+                <p class="text-xs sm:text-sm mt-2">The impossible awaits...</p>
+            </div>
+        </div>
+
+        <!-- Achievement Notification -->
+        <div id="achievement" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-600 text-black px-6 py-3 rounded-lg font-bold text-lg hidden z-30 animate-pulse">
+            ACHIEVEMENT UNLOCKED: 🎯 DIED 10 TIMES
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="sound-save-ads.js"></script>
+    <script src="script.js"></script>
+    <script>
+        feather.replace();
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // Prevent context menu on long press (mobile)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // Prevent zoom on mobile
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install button or banner
+            console.log('PWA install prompt available');
+        });
+        
+        // Google AdSense Script (Replace YOUR_ADSENSE_ID with your actual ID)
+        window.adsbygoogle = window.adsbygoogle || [];
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-YOUR_ADSENSE_ID", // Replace with your AdSense ID
+            enable_page_level_ads: true
+        });
+    </script>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID"></script>
+</body>
+</html>
