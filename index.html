@@ -67,18 +67,22 @@
         <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-95 z-10 p-4">
             <div class="text-center mb-8">
                 <h1 class="text-4xl sm:text-6xl font-bold text-red-600 mb-4 animate-pulse">HELL'S GAUNTLET</h1>
-                <p class="text-lg sm:text-2xl mb-8 text-red-400">The Impossible Ascent</p>
-                <p class="text-sm sm:text-base text-red-300 mb-4">🎮 Desktop: Arrow Keys + Space</p>
-                <p class="text-sm sm:text-base text-red-300 mb-8">📱 Mobile: Use on-screen controls</p>
+                <p class="text-lg sm:text-2xl mb-4 text-red-400">Simple but Brutal</p>
+                <div class="text-sm sm:text-base text-red-300 mb-4 space-y-2">
+                    <p>🎮 <strong>Goal:</strong> Reach the GREEN endpoint!</p>
+                    <p>🎯 <strong>Character:</strong> Black figure (that's you)</p>
+                    <p>⚠️ <strong>Difficulty:</strong> High precision required</p>
+                </div>
+                <p class="text-sm sm:text-base text-red-300 mb-8">🖥️ Arrow Keys + Space | 📱 Touch Controls</p>
             </div>
             
             <button id="start-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-red-800 text-lg sm:text-2xl rounded-lg hover:bg-red-600 active:bg-red-700 transition-all duration-200 mb-4 touch-manipulation">
-                BEGIN YOUR SUFFERING
+                START CHALLENGE
             </button>
             
             <div class="p-3 sm:p-4 bg-red-900 bg-opacity-60 rounded-lg max-w-sm text-center mb-4">
-                <p class="text-yellow-400 font-bold text-sm sm:text-base">⚠️ WARNING: IMPOSSIBLY DIFFICULT</p>
-                <p class="text-xs sm:text-sm mt-2">Designed to break your spirit and sanity</p>
+                <p class="text-yellow-400 font-bold text-sm sm:text-base">⚠️ PRECISION REQUIRED</p>
+                <p class="text-xs sm:text-sm mt-2">One mistake = instant death. Good luck!</p>
             </div>
 
             <div class="neon-blood-box">
@@ -132,6 +136,33 @@
             <div class="p-3 sm:p-4 bg-red-900 bg-opacity-60 rounded-lg max-w-sm text-center">
                 <p class="text-yellow-400 font-bold text-sm sm:text-base">🎮 GAME INFO</p>
                 <p class="text-xs sm:text-sm mt-2">The impossible awaits...</p>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="absolute inset-0 hidden flex-col items-center justify-center bg-black bg-opacity-95 z-10 p-4">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl sm:text-6xl font-bold text-green-400 mb-4">🏆 VICTORY!</h1>
+                <p class="text-xl sm:text-2xl text-white mb-2">You Reached the Goal!</p>
+                <div class="text-lg sm:text-xl text-yellow-400 space-y-2">
+                    <p>Time: <span id="final-time">0</span>s</p>
+                    <p>Deaths: <span id="final-deaths">0</span></p>
+                </div>
+            </div>
+            
+            <button id="play-again-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-green-800 text-lg sm:text-xl rounded-lg hover:bg-green-600 active:bg-green-700 transition-all duration-200 mb-4 touch-manipulation">
+                PLAY AGAIN
+            </button>
+            
+            <button id="victory-main-menu-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-gray-800 text-lg sm:text-xl rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all duration-200 mb-8 touch-manipulation">
+                MAIN MENU
+            </button>
+
+            <!-- AdSense Ad -->
+            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2">🎮 CONGRATULATIONS!</p>
+                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <p class="text-xs text-gray-400 mt-2">You did it! 🎉</p>
             </div>
         </div>
 
