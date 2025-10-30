@@ -4,7 +4,7 @@ let player;
 let platforms = [];
 let spikes = [];
 let movingPlatforms = [];
-let sawBlades = [];
+let goal; // End point
 let particles = [];
 let deathCount = 0;
 let startTime = 0;
@@ -12,15 +12,9 @@ let currentTime = 0;
 let gameRunning = false;
 let gamePaused = false;
 let lastTime = 0;
-let difficultyMultiplier = 1;
 let level = 1;
 let achievements = [];
-let stats = {
-    totalDeaths: 0,
-    longestSurvival: 0,
-    bestTime: Infinity,
-    levelsCompleted: 0
-};
+let gameWon = false;
 
 // Input handling
 const keys = {
@@ -49,61 +43,181 @@ function init() {
     // Create player
     createPlayer();
     
-    // Create initial level
-    createHellishLevel();
+    // Create simple level
+    createSimpleLevel();
     
-    // Event listeners
-    document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('retry-btn').addEventListener('click', restartGame);
-    document.getElementById('pause-btn').addEventListener('click', togglePause);
-    document.getElementById('resume-btn').addEventListener('click', togglePause);
-    document.getElementById('quit-btn').addEventListener('click', quitGame);
-    document.getElementById('save-btn').addEventListener('click', saveCheckpoint);
-    
-    // Keyboard controls
-    document.addEventListener('keydown', keyDownHandler);
-    document.addEventListener('keyup', keyUpHandler);
-    
-    // Touch controls for mobile
+    // Setup touch controls
     setupTouchControls();
     
-    // Initialize audio on first user interaction
-    document.addEventListener('click', initializeAudio, { once: true });
-    document.addEventListener('touchstart', initializeAudio, { once: true });
+    // Setup keyboard controls
+    setupKeyboardControls();
     
-    // Start auto-save
-    saveSystem.startAutoSave();
+    // Setup save system
+    setupSaveSystem();
     
     // Start game loop
-    requestAnimationFrame(gameLoop);
+    gameLoop();
 }
 
-// Initialize audio
-function initializeAudio() {
-    soundEffects.init();
-    console.log('Audio initialized');
-}
-
-// Create player
+// Create player character
 function createPlayer() {
     player = {
-        x: canvas.width / 2 - 15,
+        x: 50,
         y: canvas.height - 100,
-        width: 25,
-        height: 25,
-        color: '#ff0000',
+        width: 20,
+        height: 30,
+        color: '#000000', // Black character
         velocityX: 0,
         velocityY: 0,
-        speed: 6,
-        jumpForce: 13,
+        speed: 5,
+        jumpForce: 12,
         isJumping: false,
-        gravity: 0.6,
-        maxSpeed: 8,
-        friction: 0.8
+        gravity: 0.8,
+        maxSpeed: 6,
+        friction: 0.85,
+        direction: 1 // 1 = right, -1 = left
     };
 }
 
-// Resize canvas to window size
+// Create a simple, clear level like Level Devil
+function createSimpleLevel() {
+    platforms = [];
+    spikes = [];
+    movingPlatforms = [];
+    particles = [];
+    
+    // Ground platform
+    platforms.push({
+        x: 0,
+        y: canvas.height - 40,
+        width: canvas.width,
+        height: 40,
+        color: '#333333',
+        type: 'ground'
+    });
+    
+    // Clear pathway with simple obstacles
+    const platformHeight = canvas.height - 200;
+    
+    // Starting platform area (clear of obstacles)
+    platforms.push({
+        x: 0,
+        y: platformHeight,
+        width: 200,
+        height: 20,
+        color: '#555555',
+        type: 'start'
+    });
+    
+    // Simple stepping stones path
+    const steps = 8;
+    const stepWidth = 80;
+    const stepHeight = 20;
+    const gap = 150;
+    
+    for (let i = 0; i < steps; i++) {
+        const x = 300 + (i * gap);
+        const y = platformHeight - (i * 40); // Gradually higher
+        
+        // Skip some steps to create gaps
+        if (i !== 3 && i !== 6) {
+            platforms.push({
+                x: x,
+                y: y,
+                width: stepWidth,
+                height: stepHeight,
+                color: '#555555',
+                type: 'step'
+            });
+        }
+        
+        // Add spikes on dangerous areas
+        if (i === 2 || i === 4 || i === 7) {
+            spikes.push({
+                x: x + stepWidth / 2 - 15,
+                y: y - 25,
+                width: 30,
+                height: 25,
+                color: '#cc0000',
+                type: 'spike'
+            });
+        }
+    }
+    
+    // Moving platform section
+    platforms.push({
+        x: 300,
+        y: platformHeight - 120,
+        width: 100,
+        height: 15,
+        color: '#666666',
+        type: 'static'
+    });
+    
+    movingPlatforms.push({
+        x: 450,
+        y: platformHeight - 80,
+        width: 80,
+        height: 15,
+        color: '#777777',
+        speed: 2,
+        direction: 1,
+        minX: 450,
+        maxX: 700,
+        type: 'moving'
+    });
+    
+    platforms.push({
+        x: 750,
+        y: platformHeight - 160,
+        width: 100,
+        height: 15,
+        color: '#666666',
+        type: 'static'
+    });
+    
+    // Final approach to goal
+    platforms.push({
+        x: 900,
+        y: platformHeight - 240,
+        width: 120,
+        height: 15,
+        color: '#666666',
+        type: 'goal_platform'
+    });
+    
+    // Goal (end point) - bright and clear
+    goal = {
+        x: 1050,
+        y: platformHeight - 300,
+        width: 40,
+        height: 60,
+        color: '#00ff00', // Bright green
+        type: 'goal',
+        pulse: 0
+    };
+    
+    // Clear the area around the goal
+    spikes.push({
+        x: 1000,
+        y: platformHeight - 25,
+        width: 40,
+        height: 25,
+        color: '#cc0000',
+        type: 'guard'
+    });
+    
+    spikes.push({
+        x: 1100,
+        y: platformHeight - 25,
+        width: 40,
+        height: 25,
+        color: '#cc0000',
+        type: 'guard'
+    });
+}
+
+// Resize canvas
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -113,266 +227,13 @@ function resizeCanvas() {
     }
 }
 
-// Create an extremely difficult level
-function createHellishLevel() {
-    platforms = [];
-    spikes = [];
-    movingPlatforms = [];
-    sawBlades = [];
-    particles = [];
-    
-    // Starting platform (smaller on mobile)
-    const startWidth = window.innerWidth < 640 ? window.innerWidth - 40 : window.width;
-    platforms.push({
-        x: 20,
-        y: canvas.height - 40,
-        width: startWidth,
-        height: 20,
-        color: '#333',
-        type: 'start'
-    });
-    
-    // Base obstacles
-    const obstacleCount = Math.floor(canvas.width * canvas.height / 50000) + 50;
-    
-    for (let i = 0; i < obstacleCount; i++) {
-        const random = Math.random();
-        
-        if (random > 0.1) {
-            // Random platforms (even more frequent)
-            const platformWidth = 15 + Math.random() * 40;
-            const platformHeight = 3 + Math.random() * 8;
-            platforms.push({
-                x: Math.random() * (canvas.width - platformWidth - 40) + 20,
-                y: Math.random() * (canvas.height - 200),
-                width: platformWidth,
-                height: platformHeight,
-                color: '#555',
-                type: 'static'
-            });
-        }
-        
-        if (random > 0.3) {
-            // Spikes (more aggressive placement)
-            spikes.push({
-                x: Math.random() * (canvas.width - 30) + 15,
-                y: Math.random() * (canvas.height - 100),
-                width: 20,
-                height: 20,
-                color: '#ff0000',
-                type: 'spike'
-            });
-        }
-        
-        if (random > 0.4) {
-            // Moving platforms (faster and smaller)
-            const platformWidth = 20 + Math.random() * 40;
-            const platformHeight = 4 + Math.random() * 8;
-            const speed = 4 + Math.random() * 8;
-            movingPlatforms.push({
-                x: Math.random() * (canvas.width - platformWidth - 80) + 40,
-                y: Math.random() * (canvas.height - 200),
-                width: platformWidth,
-                height: platformHeight,
-                color: '#777',
-                speed: speed,
-                direction: Math.random() > 0.5 ? 1 : -1,
-                minX: Math.random() * (canvas.width / 3),
-                maxX: canvas.width / 3 + Math.random() * (canvas.width / 2),
-                type: 'moving'
-            });
-        }
-        
-        if (random > 0.5) {
-            // Saw blades (larger and faster)
-            sawBlades.push({
-                x: Math.random() * (canvas.width - 60) + 30,
-                y: Math.random() * (canvas.height - 60) + 30,
-                radius: 8 + Math.random() * 25,
-                speed: 4 + Math.random() * 12,
-                angle: 0,
-                color: '#ff0000',
-                type: 'saw'
-            });
-        }
-    }
-    
-    // Create the nearly impossible path to the top
-    createImpossiblePath();
-    
-    // Add death traps
-    addBrutalDeathTraps();
-}
-
-// Create the main path (intentionally nearly impossible)
-function createImpossiblePath() {
-    const pathWidth = 15; // Made platforms even narrower
-    const pathHeight = 8;
-    const steps = Math.floor(canvas.height / 20); // More steps
-    const stepHeight = (canvas.height - 120) / steps;
-    
-    let currentX = canvas.width / 2 - pathWidth / 2;
-    
-    for (let i = 0; i < steps; i++) {
-        // Add tiny platforms with massive gaps
-        platforms.push({
-            x: Math.max(10, Math.min(currentX, canvas.width - pathWidth - 10)),
-            y: canvas.height - 80 - (i * stepHeight),
-            width: pathWidth,
-            height: pathHeight,
-            color: '#444',
-            type: 'path'
-        });
-        
-        // Randomly shift position drastically
-        const shift = (Math.random() * 300 - 150) * (1 + level * 0.1);
-        currentX += shift;
-        currentX = Math.max(10, Math.min(currentX, canvas.width - pathWidth - 10));
-        
-        // Add spikes everywhere (more aggressive)
-        const spikeCount = Math.floor(Math.random() * 3) + 2;
-        for (let j = 0; j < spikeCount; j++) {
-            spikes.push({
-                x: currentX - 40 + Math.random() * 20,
-                y: canvas.height - 80 - (i * stepHeight) - 35 + Math.random() * 20,
-                width: 25,
-                height: 25,
-                color: '#ff0000',
-                type: 'trap'
-            });
-            
-            spikes.push({
-                x: currentX + pathWidth + 15 + Math.random() * 20,
-                y: canvas.height - 80 - (i * stepHeight) - 35 + Math.random() * 20,
-                width: 25,
-                height: 25,
-                color: '#ff0000',
-                type: 'trap'
-            });
-        }
-        
-        // Add moving obstacles frequently (more aggressive)
-        if (i % Math.max(1, Math.floor(3 - level * 0.1)) === 0) {
-            sawBlades.push({
-                x: currentX + pathWidth / 2,
-                y: canvas.height - 80 - (i * stepHeight) - 60,
-                radius: 20 + Math.random() * 15,
-                speed: 8 + Math.random() * 8,
-                angle: 0,
-                color: '#ff0000',
-                type: 'path_saw'
-            });
-        }
-        
-        // Add moving platforms to block the way
-        if (i % Math.max(1, Math.floor(4 - level * 0.1)) === 0) {
-            const blockWidth = 25 + Math.random() * 20;
-            movingPlatforms.push({
-                x: currentX - 80 + Math.random() * 160,
-                y: canvas.height - 80 - (i * stepHeight) - 80,
-                width: blockWidth,
-                height: 6,
-                color: '#999',
-                speed: 6 + Math.random() * 6,
-                direction: Math.random() > 0.5 ? 1 : -1,
-                minX: currentX - 120,
-                maxX: currentX + 120,
-                type: 'blocker'
-            });
-        }
-    }
-}
-
-// Add brutal death traps
-function addBrutalDeathTraps() {
-    // Narrow passages with death
-    for (let i = 0; i < 8 + level; i++) {
-        const x = Math.random() * (canvas.width - 120);
-        const y = Math.random() * (canvas.height - 250);
-        
-        // Create narrow passage
-        platforms.push({
-            x: x,
-            y: y,
-            width: 15,
-            height: 120,
-            color: '#444',
-            type: 'passage'
-        });
-        
-        // Surround with spikes (more aggressive)
-        for (let j = 0; j < 8; j++) {
-            spikes.push({
-                x: x - 35,
-                y: y + j * 15,
-                width: 25,
-                height: 25,
-                color: '#ff0000',
-                type: 'passage_trap'
-            });
-            
-            spikes.push({
-                x: x + 35,
-                y: y + j * 15,
-                width: 25,
-                height: 25,
-                color: '#ff0000',
-                type: 'passage_trap'
-            });
-        }
-    }
-    
-    // Flying saw blade corridors
-    for (let i = 0; i < 3 + level; i++) {
-        const startX = Math.random() * canvas.width;
-        const endX = Math.random() * canvas.width;
-        const y = Math.random() * (canvas.height - 200);
-        
-        for (let j = 0; j < 4; j++) {
-            sawBlades.push({
-                x: startX + j * (Math.abs(endX - startX) / 4),
-                y: y + Math.random() * 100 - 50,
-                radius: 15 + Math.random() * 20,
-                speed: 6 + Math.random() * 8,
-                angle: 0,
-                color: '#ff0000',
-                startX: Math.min(startX, endX),
-                endX: Math.max(startX, endX),
-                direction: Math.random() > 0.5 ? 1 : -1,
-                type: 'corridor'
-            });
-        }
-    }
-    
-    // Vertical moving saws
-    for (let i = 0; i < 5 + level; i++) {
-        const x = Math.random() * canvas.width;
-        const topY = 50;
-        const bottomY = canvas.height - 100;
-        
-        for (let j = 0; j < 2; j++) {
-            sawBlades.push({
-                x: x + j * 40,
-                y: (topY + bottomY) / 2,
-                radius: 12 + Math.random() * 18,
-                speed: 3 + Math.random() * 5,
-                angle: 0,
-                color: '#ff0000',
-                startY: topY,
-                endY: bottomY,
-                direction: Math.random() > 0.5 ? 1 : -1,
-                vertical: true,
-                type: 'vertical'
-            });
-        }
-    }
-}
-
 // Setup touch controls
 function setupTouchControls() {
     const leftBtn = document.getElementById('left-btn');
     const rightBtn = document.getElementById('right-btn');
     const jumpBtn = document.getElementById('jump-btn');
+    
+    if (!leftBtn || !rightBtn || !jumpBtn) return;
     
     // Touch events
     leftBtn.addEventListener('touchstart', () => { touchControls.left = true; leftBtn.classList.add('active'); });
@@ -388,7 +249,7 @@ function setupTouchControls() {
         }
     });
     
-    // Mouse events (for testing on desktop)
+    // Mouse events
     leftBtn.addEventListener('mousedown', () => { touchControls.left = true; leftBtn.classList.add('active'); });
     leftBtn.addEventListener('mouseup', () => { touchControls.left = false; leftBtn.classList.remove('active'); });
     leftBtn.addEventListener('mouseleave', () => { touchControls.left = false; leftBtn.classList.remove('active'); });
@@ -396,290 +257,129 @@ function setupTouchControls() {
     rightBtn.addEventListener('mousedown', () => { touchControls.right = true; rightBtn.classList.add('active'); });
     rightBtn.addEventListener('mouseup', () => { touchControls.right = false; rightBtn.classList.remove('active'); });
     rightBtn.addEventListener('mouseleave', () => { touchControls.right = false; rightBtn.classList.remove('active'); });
-    
-    jumpBtn.addEventListener('mousedown', () => { 
-        if (!player.isJumping) {
-            touchControls.up = true;
-            setTimeout(() => { touchControls.up = false; }, 100);
+}
+
+// Setup keyboard controls
+function setupKeyboardControls() {
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
+            if (!player.isJumping) {
+                keys.up = true;
+                setTimeout(() => { keys.up = false; }, 100);
+            }
         }
+        if (e.code === 'Escape') togglePause();
+    });
+    
+    document.addEventListener('keyup', (e) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
     });
 }
 
-// Keyboard event handlers
-function keyDownHandler(e) {
-    switch(e.code) {
-        case 'ArrowLeft':
-        case 'KeyA':
-            keys.left = true;
-            break;
-        case 'ArrowRight':
-        case 'KeyD':
-            keys.right = true;
-            break;
-        case 'ArrowUp':
-        case 'Space':
-        case 'KeyW':
-            if (!player.isJumping) {
-                keys.up = true;
-                keys.space = true;
-            }
-            break;
-    }
-}
-
-function keyUpHandler(e) {
-    switch(e.code) {
-        case 'ArrowLeft':
-        case 'KeyA':
-            keys.left = false;
-            break;
-        case 'ArrowRight':
-        case 'KeyD':
-            keys.right = false;
-            break;
-        case 'ArrowUp':
-        case 'Space':
-        case 'KeyW':
-            keys.up = false;
-            keys.space = false;
-            break;
+// Setup save system
+function setupSaveSystem() {
+    if (typeof saveSystem !== 'undefined') {
+        // Load saved data
+        const savedData = saveSystem.loadGame();
+        if (savedData && savedData.player) {
+            player.x = savedData.player.x;
+            player.y = savedData.player.y;
+            deathCount = savedData.stats.deathCount || 0;
+        }
     }
 }
 
 // Game loop
-function gameLoop(timestamp) {
-    if (!gamePaused && gameRunning) {
-        const deltaTime = timestamp - lastTime;
-        lastTime = timestamp;
-        
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    const now = Date.now();
+    const deltaTime = now - lastTime;
+    lastTime = now;
+    
+    if (!gamePaused) {
         update(deltaTime);
-        currentTime = Date.now();
-        updateTimer();
-        checkAchievements();
+        render();
     }
     
-    render();
     requestAnimationFrame(gameLoop);
 }
 
 // Update game state
 function update(deltaTime) {
-    // Handle input
-    handleInput();
+    // Update player
+    updatePlayer();
+    
+    // Update moving platforms
+    updateMovingPlatforms();
+    
+    // Update particles
+    updateParticles();
+    
+    // Update goal animation
+    if (goal) {
+        goal.pulse += deltaTime * 0.01;
+    }
+    
+    // Check collisions
+    checkCollisions();
+    
+    // Check win condition
+    checkWinCondition();
+    
+    currentTime = Date.now() - startTime;
+}
+
+// Update player
+function updatePlayer() {
+    // Horizontal movement
+    if (keys.left || touchControls.left) {
+        player.velocityX = -player.speed;
+        player.direction = -1;
+    } else if (keys.right || touchControls.right) {
+        player.velocityX = player.speed;
+        player.direction = 1;
+    } else {
+        player.velocityX *= player.friction;
+        if (Math.abs(player.velocityX) < 0.1) player.velocityX = 0;
+    }
+    
+    // Vertical movement
+    if ((keys.up || touchControls.up) && !player.isJumping) {
+        player.velocityY = -player.jumpForce;
+        player.isJumping = true;
+        playJumpSound();
+    }
     
     // Apply gravity
     player.velocityY += player.gravity;
     
-    // Apply friction
-    if (!keys.left && !keys.right && !touchControls.left && !touchControls.right) {
-        player.velocityX *= player.friction;
-    }
-    
-    // Limit speed
-    player.velocityX = Math.max(-player.maxSpeed, Math.min(player.maxSpeed, player.velocityX));
-    
-    // Update player position
+    // Apply velocity
     player.x += player.velocityX;
     player.y += player.velocityY;
     
-    // Check platform collisions
-    let onGround = false;
-    platforms.forEach(platform => {
-        if (checkCollision(player, platform)) {
-            // Top collision
-            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y + 5) {
-                player.y = platform.y - player.height;
-                player.velocityY = 0;
-                player.isJumping = false;
-                onGround = true;
-                if (player.velocityY > 5) { // Play landing sound if falling fast
-                    soundEffects.playLanding();
-                }
-            }
-            // Bottom collision
-            else if (player.velocityY < 0 && player.y - player.velocityY >= platform.y + platform.height - 5) {
-                player.y = platform.y + platform.height;
-                player.velocityY = 0;
-            }
-            // Side collisions (still kill)
-            else {
-                playerDie();
-            }
-        }
-    });
+    // Boundaries
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
     
-    // Update moving platforms
+    // Check if player fell off the map
+    if (player.y > canvas.height + 100) {
+        playerDie();
+    }
+}
+
+// Update moving platforms
+function updateMovingPlatforms() {
     movingPlatforms.forEach(platform => {
         platform.x += platform.speed * platform.direction;
         
         if (platform.x <= platform.minX || platform.x + platform.width >= platform.maxX) {
             platform.direction *= -1;
         }
-        
-        if (checkCollision(player, platform)) {
-            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y + 5) {
-                player.y = platform.y - player.height;
-                player.x += platform.speed * platform.direction;
-                player.velocityY = 0;
-                player.isJumping = false;
-                onGround = true;
-            } else {
-                playerDie();
-            }
-        }
     });
-    
-    // Update flying saw blades
-    sawBlades.forEach(saw => {
-        if (saw.vertical) {
-            saw.y += saw.speed * saw.direction;
-            if (saw.y <= saw.startY || saw.y >= saw.endY) {
-                saw.direction *= -1;
-            }
-        } else {
-            if (saw.startX !== undefined && saw.endX !== undefined) {
-                saw.x += saw.speed * saw.direction;
-                if ((saw.direction > 0 && saw.x > saw.endX) || 
-                    (saw.direction < 0 && saw.x < saw.startX)) {
-                    saw.direction *= -1;
-                }
-            }
-        }
-        saw.angle += saw.speed * 3;
-    });
-    
-    // Check collisions with deadly objects
-    spikes.forEach(spike => {
-        if (checkCollision(player, spike)) {
-            playerDie();
-        }
-    });
-    
-    sawBlades.forEach(saw => {
-        const distance = Math.sqrt(
-            Math.pow(player.x + player.width / 2 - saw.x, 2) + 
-            Math.pow(player.y + player.height / 2 - saw.y, 2)
-        );
-        
-        if (distance < saw.radius + player.width / 2) {
-            playerDie();
-        }
-    });
-    
-    // Update particles
-    updateParticles();
-    
-    // Death conditions
-    if (player.y > canvas.height + 50) {
-        playerDie();
-    }
-    
-    // Make it nearly impossible to win
-    if (player.y < 50 && Math.random() > 0.01) {
-        playerDie();
-    }
-    
-    // Increase difficulty
-    difficultyMultiplier = 1 + (currentTime - startTime) / 30000;
-    
-    movingPlatforms.forEach(platform => {
-        platform.speed = Math.min(platform.speed * (1 + difficultyMultiplier * 0.01), 20);
-    });
-    
-    sawBlades.forEach(saw => {
-        saw.speed = Math.min(saw.speed * (1 + difficultyMultiplier * 0.01), 25);
-    });
-}
-
-// Handle player input
-function handleInput() {
-    // Horizontal movement
-    const currentLeft = keys.left || touchControls.left;
-    const currentRight = keys.right || touchControls.right;
-    const currentUp = keys.up || touchControls.up;
-    
-    if (currentLeft && !currentRight) {
-        player.velocityX -= 0.8;
-    } else if (currentRight && !currentLeft) {
-        player.velocityX += 0.8;
-    }
-    
-    // Jump
-    if (currentUp && !player.isJumping) {
-        player.velocityY = -player.jumpForce;
-        player.isJumping = true;
-        soundEffects.playJump();
-    }
-    
-    // Keep player in bounds
-    if (player.x < 0) {
-        player.x = 0;
-        player.velocityX = 0;
-    }
-    if (player.x + player.width > canvas.width) {
-        player.x = canvas.width - player.width;
-        player.velocityX = 0;
-    }
-}
-
-// Check collision between two objects
-function checkCollision(obj1, obj2) {
-    return obj1.x < obj2.x + obj2.width &&
-           obj1.x + obj1.width > obj2.x &&
-           obj1.y < obj2.y + obj2.height &&
-           obj1.y + obj1.height > obj2.y;
-}
-
-// Player death
-function playerDie() {
-    // Play death sound
-    soundEffects.playDeath();
-    soundEffects.playScreenShake();
-    
-    // Update stats
-    stats.totalDeaths++;
-    const survivalTime = (currentTime - startTime) / 1000;
-    if (survivalTime > stats.longestSurvival) {
-        stats.longestSurvival = survivalTime;
-    }
-    
-    // Save game immediately on death
-    saveSystem.saveGame();
-    
-    // Show interstitial ad every 5 deaths
-    adManager.maybeShowInterstitial();
-    
-    // Create death particles
-    createDeathParticles();
-    
-    // Screen flash
-    canvas.classList.add('flash');
-    setTimeout(() => canvas.classList.remove('flash'), 200);
-    
-    deathCount++;
-    updateUI();
-    
-    // Show death screen after delay
-    setTimeout(() => {
-        showDeathScreen();
-        gameRunning = false;
-    }, 500);
-}
-
-// Create death particles
-function createDeathParticles() {
-    for (let i = 0; i < 15; i++) {
-        particles.push({
-            x: player.x + player.width / 2,
-            y: player.y + player.height / 2,
-            velocityX: (Math.random() - 0.5) * 10,
-            velocityY: (Math.random() - 0.5) * 10,
-            life: 60,
-            maxLife: 60,
-            size: 2 + Math.random() * 4,
-            color: '#ff0000'
-        });
-    }
 }
 
 // Update particles
@@ -687,282 +387,445 @@ function updateParticles() {
     particles = particles.filter(particle => {
         particle.x += particle.velocityX;
         particle.y += particle.velocityY;
-        particle.velocityY += 0.2; // Gravity
-        particle.life--;
-        return particle.life > 0;
+        particle.life -= 1;
+        particle.size *= 0.98;
+        
+        return particle.life > 0 && particle.size > 0.5;
     });
 }
 
-// Check achievements
-function checkAchievements() {
-    const newAchievements = [];
+// Check collisions
+function checkCollisions() {
+    let onGround = false;
     
-    if (deathCount >= 10 && !achievements.includes('died_10_times')) {
-        achievements.push('died_10_times');
-        newAchievements.push('🎯 DIED 10 TIMES');
-    }
-    
-    if (deathCount >= 50 && !achievements.includes('died_50_times')) {
-        achievements.push('died_50_times');
-        newAchievements.push('💀 DIED 50 TIMES');
-    }
-    
-    if (deathCount >= 100 && !achievements.includes('died_100_times')) {
-        achievements.push('died_100_times');
-        newAchievements.push('🔥 DIED 100 TIMES');
-    }
-    
-    if (stats.totalDeaths >= 500 && !achievements.includes('total_500_deaths')) {
-        achievements.push('total_500_deaths');
-        newAchievements.push('👹 DEATH MASTER');
-    }
-    
-    // Show new achievements
-    newAchievements.forEach((achievement, index) => {
-        setTimeout(() => {
-            showAchievement(achievement);
-        }, index * 2000);
+    // Platform collisions
+    [...platforms, ...movingPlatforms].forEach(platform => {
+        if (rectCollide(player, platform)) {
+            // Vertical collision (landing on platform)
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y + 5) {
+                player.y = platform.y - player.height;
+                player.velocityY = 0;
+                player.isJumping = false;
+                onGround = true;
+                
+                // Land sound
+                if (typeof SoundSystem !== 'undefined') {
+                    SoundSystem.play('landing');
+                }
+            }
+            // Vertical collision (hitting platform from below)
+            else if (player.velocityY < 0 && player.y - player.velocityY >= platform.y + platform.height - 5) {
+                player.y = platform.y + platform.height;
+                player.velocityY = 0;
+            }
+            // Horizontal collision
+            else if (player.velocityX > 0) {
+                player.x = platform.x - player.width;
+            } else if (player.velocityX < 0) {
+                player.x = platform.x + platform.width;
+            }
+        }
     });
+    
+    // Spike collisions
+    spikes.forEach(spike => {
+        if (rectCollide(player, spike)) {
+            playerDie();
+        }
+    });
+    
+    // Moving platform riding
+    if (!onGround) {
+        movingPlatforms.forEach(platform => {
+            if (player.y + player.height >= platform.y &&
+                player.y + player.height <= platform.y + 10 &&
+                player.x + player.width > platform.x &&
+                player.x < platform.x + platform.width &&
+                player.velocityY >= 0) {
+                player.y = platform.y - player.height;
+                player.velocityY = 0;
+                player.isJumping = false;
+                player.x += platform.speed * platform.direction * 0.5;
+            }
+        });
+    }
 }
 
-// Show achievement notification
-function showAchievement(text) {
-    // Play achievement sound
-    soundEffects.playAchievement();
+// Check win condition
+function checkWinCondition() {
+    if (goal && rectCollide(player, goal) && !gameWon) {
+        gameWon = true;
+        showVictoryScreen();
+    }
+}
+
+// Rectangle collision detection
+function rectCollide(rect1, rect2) {
+    return rect1.x < rect2.x + rect2.width &&
+           rect1.x + rect1.width > rect2.x &&
+           rect1.y < rect2.y + rect2.height &&
+           rect1.y + rect1.height > rect2.y;
+}
+
+// Player death
+function playerDie() {
+    deathCount++;
+    stats.totalDeaths++;
     
-    const achievement = document.getElementById('achievement');
-    achievement.textContent = `ACHIEVEMENT UNLOCKED: ${text}`;
-    achievement.classList.remove('hidden');
-    achievement.style.animation = 'none';
+    // Death sound
+    if (typeof SoundSystem !== 'undefined') {
+        SoundSystem.play('death');
+    }
+    
+    // Blood particles
+    for (let i = 0; i < 15; i++) {
+        particles.push({
+            x: player.x + player.width / 2,
+            y: player.y + player.height / 2,
+            velocityX: (Math.random() - 0.5) * 10,
+            velocityY: (Math.random() - 0.5) * 10,
+            size: 3 + Math.random() * 5,
+            life: 30 + Math.random() * 20,
+            maxLife: 50,
+            color: '#cc0000'
+        });
+    }
+    
+    // Respawn
     setTimeout(() => {
-        achievement.style.animation = 'achievementSlide 3s ease-in-out forwards';
-    }, 10);
+        player.x = 50;
+        player.y = canvas.height - 100;
+        player.velocityX = 0;
+        player.velocityY = 0;
+        player.isJumping = false;
+        
+        if (typeof saveSystem !== 'undefined') {
+            saveSystem.setCheckpoint(player.x, player.y);
+        }
+    }, 100);
+}
+
+// Show victory screen
+function showVictoryScreen() {
+    const victoryScreen = document.getElementById('victory-screen');
+    const finalTime = Math.floor(currentTime / 1000);
+    
+    document.getElementById('final-time').textContent = finalTime + 's';
+    document.getElementById('final-deaths').textContent = deathCount;
+    
+    if (typeof SoundSystem !== 'undefined') {
+        SoundSystem.play('achievement');
+    }
+    
+    // Achievement
+    if (!achievements.includes('victory')) {
+        achievements.push('victory');
+    }
+    
+    if (victoryScreen) {
+        victoryScreen.classList.remove('hidden');
+    }
 }
 
 // Render game
 function render() {
     // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw background with gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#1a0000');
-    gradient.addColorStop(1, '#000000');
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = '#1a1a1a'; // Dark background
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw goal (bright and pulsing)
+    if (goal) {
+        ctx.save();
+        const pulse = Math.sin(goal.pulse) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(0, 255, 0, ${pulse})`;
+        ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+        
+        // Goal glow
+        ctx.shadowColor = '#00ff00';
+        ctx.shadowBlur = 20;
+        ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+        
+        // Goal text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('GOAL', goal.x + goal.width/2, goal.y - 10);
+    }
     
     // Draw platforms
     platforms.forEach(platform => {
         ctx.fillStyle = platform.color;
         ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-        
-        // Add glow effect for path platforms
-        if (platform.type === 'path') {
-            ctx.shadowColor = '#666';
-            ctx.shadowBlur = 5;
-            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-            ctx.shadowBlur = 0;
-        }
     });
     
     // Draw moving platforms
     movingPlatforms.forEach(platform => {
         ctx.fillStyle = platform.color;
         ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-        
-        // Add warning glow
-        ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = 3;
-        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-        ctx.shadowBlur = 0;
     });
     
     // Draw spikes
     spikes.forEach(spike => {
         ctx.fillStyle = spike.color;
+        
+        // Draw triangular spike
         ctx.beginPath();
         ctx.moveTo(spike.x, spike.y + spike.height);
         ctx.lineTo(spike.x + spike.width / 2, spike.y);
         ctx.lineTo(spike.x + spike.width, spike.y + spike.height);
         ctx.closePath();
         ctx.fill();
-        
-        // Add glow
-        ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = 5;
-        ctx.fill();
-        ctx.shadowBlur = 0;
     });
     
-    // Draw saw blades
-    sawBlades.forEach(saw => {
-        ctx.save();
-        ctx.translate(saw.x, saw.y);
-        ctx.rotate(saw.angle * Math.PI / 180);
-        
-        // Draw saw blade
-        ctx.fillStyle = '#444';
-        ctx.beginPath();
-        ctx.arc(0, 0, saw.radius, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw teeth
-        ctx.fillStyle = '#888';
-        const teethCount = 8;
-        for (let i = 0; i < teethCount; i++) {
-            const angle = (i / teethCount) * Math.PI * 2;
-            const x1 = Math.cos(angle) * (saw.radius - 5);
-            const y1 = Math.sin(angle) * (saw.radius - 5);
-            const x2 = Math.cos(angle) * (saw.radius + 8);
-            const y2 = Math.sin(angle) * (saw.radius + 8);
-            
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.lineTo(Math.cos(angle + 0.3) * (saw.radius + 5), Math.sin(angle + 0.3) * (saw.radius + 5));
-            ctx.closePath();
-            ctx.fill();
-        }
-        
-        // Center
-        ctx.fillStyle = '#222';
-        ctx.beginPath();
-        ctx.arc(0, 0, saw.radius / 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.restore();
-        
-        // Add glow
-        ctx.shadowColor = '#ff0000';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(saw.x, saw.y, saw.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = '#ff0000';
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-    });
-    
-    // Draw player
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    
-    // Add player glow
-    ctx.shadowColor = '#ff0000';
-    ctx.shadowBlur = 10;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    ctx.shadowBlur = 0;
+    // Draw 2D character
+    draw2DCharacter();
     
     // Draw particles
     particles.forEach(particle => {
         const alpha = particle.life / particle.maxLife;
-        ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+        ctx.fillStyle = particle.color.replace('cc', Math.floor(alpha * 204));
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fill();
     });
     
-    // Draw level indicator on mobile
-    if (window.innerWidth < 640) {
-        const levelIndicator = document.getElementById('level-indicator');
-        levelIndicator.textContent = `Level: ${level}`;
-        levelIndicator.classList.remove('hidden');
+    // Draw UI
+    drawUI();
+}
+
+// Draw 2D character
+function draw2DCharacter() {
+    ctx.save();
+    
+    // Character shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(player.x + player.width/2, player.y + player.height, player.width/2, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Body
+    ctx.fillStyle = '#000000'; // Black character
+    ctx.fillRect(player.x, player.y + 8, player.width, player.height - 8);
+    
+    // Head
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/2, player.y + 6, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Simple face details (eyes)
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/2 - 3, player.y + 4, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(player.x + player.width/2 + 3, player.y + 4, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+// Draw UI
+function drawUI() {
+    // Death counter
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Deaths: ${deathCount}`, 20, 30);
+    
+    // Timer
+    const timeSeconds = Math.floor(currentTime / 1000);
+    ctx.fillText(`Time: ${timeSeconds}s`, 20, 55);
+    
+    // Instructions (only show at start)
+    if (currentTime < 5000 && !gameWon) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('← → to move, Space to jump', canvas.width / 2, 50);
+        ctx.fillText('Reach the GREEN GOAL!', canvas.width / 2, 75);
+    }
+    
+    // Win message
+    if (gameWon) {
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '32px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('YOU WIN!', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.font = '18px Arial';
+        ctx.fillText(`Time: ${Math.floor(currentTime / 1000)}s | Deaths: ${deathCount}`, canvas.width / 2, canvas.height / 2 + 10);
     }
 }
 
-// Update UI
-function updateUI() {
-    document.getElementById('deaths-counter').textContent = `Deaths: ${deathCount}`;
-    document.getElementById('death-count').textContent = deathCount;
-    document.getElementById('level-indicator').textContent = `Level: ${level}`;
-}
-
-// Update timer
-function updateTimer() {
-    const elapsed = Math.floor((currentTime - startTime) / 1000);
-    const minutes = Math.floor(elapsed / 60);
-    const seconds = elapsed % 60;
-    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
-    document.getElementById('time-counter').textContent = `Time: ${timeString}`;
-    document.getElementById('death-time').textContent = timeString;
-}
-
-// Game state management
-function startGame() {
-    document.getElementById('start-screen').classList.add('hidden');
-    document.getElementById('death-screen').classList.add('hidden');
-    document.getElementById('pause-screen').classList.add('hidden');
-    
-    gameRunning = true;
-    gamePaused = false;
-    startTime = Date.now();
-    currentTime = startTime;
-    
-    // Reset player position
-    player.x = canvas.width / 2 - player.width / 2;
-    player.y = canvas.height - 100;
-    player.velocityX = 0;
-    player.velocityY = 0;
-    player.isJumping = false;
-    
-    createPlayer();
-    createHellishLevel();
-    lastTime = performance.now();
-}
-
-function restartGame() {
-    document.getElementById('death-screen').classList.add('hidden');
-    startGame();
-}
-
+// Toggle pause
 function togglePause() {
-    if (gamePaused) {
-        gamePaused = false;
-        document.getElementById('pause-screen').classList.add('hidden');
-        lastTime = performance.now();
-    } else {
-        gamePaused = true;
-        document.getElementById('pause-screen').classList.remove('hidden');
+    gamePaused = !gamePaused;
+    const pauseScreen = document.getElementById('pause-screen');
+    if (pauseScreen) {
+        if (gamePaused) {
+            pauseScreen.classList.remove('hidden');
+        } else {
+            pauseScreen.classList.add('hidden');
+        }
     }
 }
 
-function quitGame() {
-    document.getElementById('pause-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    gameRunning = false;
-    gamePaused = false;
+// Play sounds
+function playJumpSound() {
+    if (typeof SoundSystem !== 'undefined') {
+        SoundSystem.play('jump');
+    }
+}
+
+// Start game
+function startGame() {
+    if (!gameRunning) {
+        gameRunning = true;
+        gamePaused = false;
+        startTime = Date.now();
+        lastTime = startTime;
+        gameLoop();
+    }
+}
+
+// Reset game
+function resetGame() {
     deathCount = 0;
-    level = 1;
-    updateUI();
+    gameWon = false;
+    currentTime = 0;
+    createSimpleLevel();
+    createPlayer();
+    
+    if (typeof saveSystem !== 'undefined') {
+        saveSystem.setCheckpoint(player.x, player.y);
+    }
 }
 
-// Save checkpoint function
-function saveCheckpoint() {
-    saveSystem.setCheckpoint(player.x, player.y);
-    saveSystem.saveGame();
-    
-    // Show save confirmation
-    const saveBtn = document.getElementById('save-btn');
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = '✅ SAVED!';
-    saveBtn.style.backgroundColor = '#16a34a';
-    
-    setTimeout(() => {
-        saveBtn.textContent = originalText;
-        saveBtn.style.backgroundColor = '';
-    }, 1500);
-}
-
-function showDeathScreen() {
-    document.getElementById('death-screen').classList.remove('hidden');
-}
+// Save system integration
+let saveSystem;
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', init);
-
-// Prevent page scroll on spacebar
-window.addEventListener('keydown', function(e) {
-    if(e.code === 'Space' && e.target === document.body) {
-        e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+    // Start button
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) startScreen.classList.add('hidden');
+            startGame();
+        });
     }
+    
+    // Restart button
+    const restartBtn = document.getElementById('restart-btn');
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            const deathScreen = document.getElementById('death-screen');
+            if (deathScreen) deathScreen.classList.add('hidden');
+            resetGame();
+            startGame();
+        });
+    }
+    
+    // Resume button
+    const resumeBtn = document.getElementById('resume-btn');
+    if (resumeBtn) {
+        resumeBtn.addEventListener('click', togglePause);
+    }
+    
+    // Main menu button
+    const mainMenuBtn = document.getElementById('main-menu-btn');
+    if (mainMenuBtn) {
+        mainMenuBtn.addEventListener('click', () => {
+            const pauseScreen = document.getElementById('pause-screen');
+            const deathScreen = document.getElementById('death-screen');
+            const victoryScreen = document.getElementById('victory-screen');
+            
+            [pauseScreen, deathScreen, victoryScreen].forEach(screen => {
+                if (screen) screen.classList.add('hidden');
+            });
+            
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) startScreen.classList.remove('hidden');
+            
+            gameRunning = false;
+            gamePaused = false;
+            resetGame();
+        });
+    }
+    
+    // Victory screen buttons
+    const playAgainBtn = document.getElementById('play-again-btn');
+    if (playAgainBtn) {
+        playAgainBtn.addEventListener('click', () => {
+            const victoryScreen = document.getElementById('victory-screen');
+            if (victoryScreen) victoryScreen.classList.add('hidden');
+            resetGame();
+            startGame();
+        });
+    }
+    
+    const victoryMainMenuBtn = document.getElementById('victory-main-menu-btn');
+    if (victoryMainMenuBtn) {
+        victoryMainMenuBtn.addEventListener('click', () => {
+            const victoryScreen = document.getElementById('victory-screen');
+            if (victoryScreen) victoryScreen.classList.add('hidden');
+            
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) startScreen.classList.remove('hidden');
+            
+            gameRunning = false;
+            gamePaused = false;
+            resetGame();
+        });
+    }
+    
+    // Save/Load buttons
+    const saveBtn = document.getElementById('save-btn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            if (typeof saveSystem !== 'undefined') {
+                saveSystem.saveGame({
+                    player: { x: player.x, y: player.y },
+                    stats: { deathCount, currentTime },
+                    achievements
+                });
+                alert('Game saved!');
+            }
+        });
+    }
+    
+    const loadBtn = document.getElementById('load-btn');
+    if (loadBtn) {
+        loadBtn.addEventListener('click', () => {
+            if (typeof saveSystem !== 'undefined') {
+                const saved = saveSystem.loadGame();
+                if (saved) {
+                    player.x = saved.player.x;
+                    player.y = saved.player.y;
+                    deathCount = saved.stats.deathCount || 0;
+                    achievements = saved.achievements || [];
+                    alert('Game loaded!');
+                } else {
+                    alert('No saved game found!');
+                }
+            }
+        });
+    }
+    
+    // Mute button
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) {
+        muteBtn.addEventListener('click', () => {
+            if (typeof SoundSystem !== 'undefined') {
+                SoundSystem.toggleMute();
+                muteBtn.textContent = SoundSystem.muted ? '🔊' : '🔇';
+            }
+        });
+    }
+    
+    // Initialize game
+    init();
 });
