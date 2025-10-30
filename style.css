@@ -322,3 +322,64 @@ button:active {
     0%, 100% { background: transparent; }
     50% { background: rgba(255, 0, 0, 0.3); }
 }
+
+/* Victory Screen Animations */
+@keyframes victoryPulse {
+    0%, 100% { 
+        transform: scale(1);
+        text-shadow: 0 0 10px #00ff00;
+    }
+    50% { 
+        transform: scale(1.05);
+        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
+    }
+}
+
+#victory-screen h1 {
+    animation: victoryPulse 1s ease-in-out infinite;
+}
+
+/* Goal pulsing effect */
+@keyframes goalGlow {
+    0%, 100% { 
+        box-shadow: 0 0 10px #00ff00;
+    }
+    50% { 
+        box-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
+    }
+}
+
+/* Clean, minimalist game area */
+#gameCanvas {
+    background: #1a1a1a !important;
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #333;
+}
+
+/* Better contrast for game elements */
+.platform {
+    background: #555 !important;
+}
+
+.spike {
+    background: #cc0000 !important;
+}
+
+.moving-platform {
+    background: #777 !important;
+}
+
+/* Clear goal indicator */
+.goal-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 255, 0, 0.2);
+    border: 2px solid #00ff00;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #00ff00;
+    font-weight: bold;
+    z-index: 100;
+}
