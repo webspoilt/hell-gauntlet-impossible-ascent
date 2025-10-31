@@ -39,27 +39,32 @@
                 <span id="deaths-counter" class="text-sm sm:text-xl font-bold">Deaths: 0</span>
                 <span id="time-counter" class="text-sm sm:text-xl font-bold">Time: 0:00</span>
                 <span id="level-indicator" class="text-xs sm:text-sm text-yellow-400 hidden sm:block">Level: 1</span>
+                <!-- Debug Info -->
+                <span id="debug-info" class="text-xs text-blue-400 font-mono hidden">JUMP: 18 | SPD: 8</span>
             </div>
             <button id="pause-btn" class="px-2 py-1 sm:px-4 sm:py-2 bg-red-900 rounded-lg hover:bg-red-700 transition-colors touch-manipulation">
                 <i data-feather="pause" class="w-4 h-4 sm:w-6 sm:h-6"></i>
             </button>
         </div>
 
-        <!-- Enhanced Mobile Controls -->
-        <div id="mobile-controls" class="absolute bottom-6 left-4 right-4 flex justify-between items-end z-20 lg:hidden">
+        <!-- Enhanced Mobile Controls - Always visible for testing -->
+        <div id="mobile-controls" class="absolute bottom-6 left-4 right-4 flex justify-between items-end z-20" style="display: flex !important;">
             <!-- Left movement controls -->
             <div class="flex space-x-4">
-                <button id="left-btn" class="w-18 h-18 sm:w-20 sm:h-20 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90">
-                    <i data-feather="chevron-left" class="w-10 h-10 sm:w-12 sm:h-12 text-white drop-shadow-md"></i>
+                <button id="left-btn" class="w-20 h-20 sm:w-24 sm:h-24 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90" 
+                        style="touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                    <i data-feather="chevron-left" class="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-md"></i>
                 </button>
-                <button id="right-btn" class="w-18 h-18 sm:w-20 sm:h-20 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90">
-                    <i data-feather="chevron-right" class="w-10 h-10 sm:w-12 sm:h-12 text-white drop-shadow-md"></i>
+                <button id="right-btn" class="w-20 h-20 sm:w-24 sm:h-24 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90"
+                        style="touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                    <i data-feather="chevron-right" class="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-md"></i>
                 </button>
             </div>
             
             <!-- Jump button -->
-            <button id="jump-btn" class="w-22 h-22 sm:w-26 sm:h-26 bg-orange-500 bg-opacity-95 rounded-full border-3 border-orange-400 flex items-center justify-center touch-manipulation active:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-xl transform transition-all duration-150 active:scale-90">
-                <i data-feather="arrow-up" class="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-md"></i>
+            <button id="jump-btn" class="w-24 h-24 sm:w-28 sm:h-28 bg-orange-500 bg-opacity-95 rounded-full border-3 border-orange-400 flex items-center justify-center touch-manipulation active:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-xl transform transition-all duration-150 active:scale-90"
+                    style="touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                <i data-feather="arrow-up" class="w-14 h-14 sm:w-16 sm:h-16 text-white drop-shadow-md"></i>
             </button>
         </div>
 
