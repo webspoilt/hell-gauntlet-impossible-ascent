@@ -260,7 +260,7 @@ let saveSystem = new SaveSystem();
 class AdSenseManager {
     constructor() {
         this.adsenseId = 'ca-pub-1394235508992153';
-        this.slotId = 'YOUR_SLOT_ID'; // Replace with your slot ID from AdSense dashboard
+        this.slotId = 'XXXXXXXXXX'; // Replace with your actual slot ID from AdSense dashboard
         this.revenueTracker = {
             impressions: 0,
             clicks: 0,
