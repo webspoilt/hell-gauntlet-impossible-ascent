@@ -11,25 +11,33 @@ function init(){
     gameLoop();
 }
 
-// Player creation
+// Player creation - FIXED JUMP PHYSICS
 function createPlayer(){
-    player={x:50,y:canvas.height-100,width:20,height:30,color:'#000000',velocityX:0,velocityY:0,speed:5,jumpForce:12,isJumping:false,gravity:0.8,maxSpeed:6,friction:0.85,direction:1};
+    player={x:50,y:canvas.height-150,width:20,height:30,color:'#000000',velocityX:0,velocityY:0,speed:8,jumpForce:18,isJumping:false,gravity:0.45,maxSpeed:8,friction:0.85,direction:1};
+    console.log('Player created with jumpForce:', player.jumpForce, 'gravity:', player.gravity);
 }
 
-// Level creation - simple but challenging like Level Devil
+// Level creation - FIXED for playable jumping
 function createSimpleLevel(){
     platforms=[];spikes=[];movingPlatforms=[];particles=[];
     
     // Ground
     platforms.push({x:0,y:canvas.height-40,width:canvas.width,height:40,color:'#333333',type:'ground'});
     
-    // Start area
-    platforms.push({x:0,y:canvas.height-200,width:200,height:20,color:'#555555',type:'start'});
+    // TEST SECTION - Simple jumping test
+    platforms.push({x:0,y:canvas.height-150,width:150,height:20,color:'#44aa44',type:'start'}); // Start platform (green)
+    platforms.push({x:200,y:canvas.height-150,width:100,height:20,color:'#555555',type:'test1'}); // Easy jump
+    platforms.push({x:350,y:canvas.height-150,width:100,height:20,color:'#555555',type:'test2'}); // Easy jump
     
-    // Stepping stones path
-    const steps=8,stepWidth=80,stepHeight=20,gap=150;
+    // EASY practice section
+    platforms.push({x:100,y:canvas.height-200,width:80,height:20,color:'#666666',type:'practice1'});
+    platforms.push({x:220,y:canvas.height-220,width:80,height:20,color:'#666666',type:'practice2'});
+    platforms.push({x:340,y:canvas.height-240,width:80,height:20,color:'#666666',type:'practice3'});
+    
+    // EASY stepping stones path - REDUCED gaps and height differences
+    const steps=8,stepWidth=80,stepHeight=20,gap=120; // Reduced gap from 150 to 120
     for(let i=0;i<steps;i++){
-        const x=300+(i*gap),y=canvas.height-200-(i*40);
+        const x=250+(i*gap),y=canvas.height-150-(i*25); // Reduced height increase from 40 to 25
         if(i!==3&&i!==6){
             platforms.push({x:x,y:y,width:stepWidth,height:stepHeight,color:'#555555',type:'step'});
         }
@@ -38,18 +46,18 @@ function createSimpleLevel(){
         }
     }
     
-    // Moving platform section
-    platforms.push({x:300,y:canvas.height-320,width:100,height:15,color:'#666666',type:'static'});
-    movingPlatforms.push({x:450,y:canvas.height-280,width:80,height:15,color:'#777777',speed:2,direction:1,minX:450,maxX:700,type:'moving'});
-    platforms.push({x:750,y:canvas.height-360,width:100,height:15,color:'#666666',type:'static'});
-    platforms.push({x:900,y:canvas.height-440,width:120,height:15,color:'#666666',type:'goal_platform'});
+    // Moving platform section - REPOSITIONED for accessibility
+    platforms.push({x:280,y:canvas.height-250,width:100,height:15,color:'#666666',type:'static'});
+    movingPlatforms.push({x:450,y:canvas.height-220,width:80,height:15,color:'#777777',speed:1.5,direction:1,minX:450,maxX:650,type:'moving'});
+    platforms.push({x:700,y:canvas.height-280,width:100,height:15,color:'#666666',type:'static'});
+    platforms.push({x:850,y:canvas.height-320,width:120,height:15,color:'#666666',type:'goal_platform'});
     
-    // Goal
-    goal={x:1050,y:canvas.height-500,width:40,height:60,color:'#00ff00',type:'goal',pulse:0};
+    // Goal - ACCESSIBLE height
+    goal={x:980,y:canvas.height-380,width:40,height:60,color:'#00ff00',type:'goal',pulse:0};
     
     // Guard spikes
-    spikes.push({x:1000,y:canvas.height-25,width:40,height:25,color:'#cc0000',type:'guard'});
-    spikes.push({x:1100,y:canvas.height-25,width:40,height:25,color:'#cc0000',type:'guard'});
+    spikes.push({x:950,y:canvas.height-25,width:40,height:25,color:'#cc0000',type:'guard'});
+    spikes.push({x:1050,y:canvas.height-25,width:40,height:25,color:'#cc0000',type:'guard'});
 }
 
 // Canvas resize
@@ -85,12 +93,34 @@ function setupTouchControls(){
     setupButton(leftBtn,'left');
     setupButton(rightBtn,'right');
     
-    // Jump button with special handling
-    jumpBtn.addEventListener('touchstart',(e)=>{preventDefaults(e);if(!player.isJumping){touchControls.up=true;setTimeout(()=>{touchControls.up=false},100)}},{passive:false});
+    // Jump button with IMPROVED handling
+    jumpBtn.addEventListener('touchstart',(e)=>{
+        preventDefaults(e);
+        console.log('Jump button pressed!'); // Debug log
+        if(!player.isJumping){
+            player.velocityY=-player.jumpForce;
+            player.isJumping=true;
+            touchControls.up=true;
+            setTimeout(()=>{touchControls.up=false},150);
+            console.log('Jump executed! VelocityY:', player.velocityY); // Debug log
+        }
+    },{passive:false});
+    
     jumpBtn.addEventListener('touchend',(e)=>{preventDefaults(e);touchControls.up=false},{passive:false});
     jumpBtn.addEventListener('touchcancel',(e)=>{preventDefaults(e);touchControls.up=false},{passive:false});
     
-    jumpBtn.addEventListener('mousedown',(e)=>{preventDefaults(e);if(!player.isJumping){touchControls.up=true;setTimeout(()=>{touchControls.up=false},100)}});
+    jumpBtn.addEventListener('mousedown',(e)=>{
+        preventDefaults(e);
+        console.log('Jump button clicked!'); // Debug log
+        if(!player.isJumping){
+            player.velocityY=-player.jumpForce;
+            player.isJumping=true;
+            touchControls.up=true;
+            setTimeout(()=>{touchControls.up=false},150);
+            console.log('Jump executed! VelocityY:', player.velocityY); // Debug log
+        }
+    });
+    
     jumpBtn.addEventListener('mouseup',(e)=>{preventDefaults(e);touchControls.up=false});
     jumpBtn.addEventListener('mouseleave',(e)=>{preventDefaults(e);touchControls.up=false});
     jumpBtn.addEventListener('contextmenu',(e)=>e.preventDefault());
@@ -109,8 +139,22 @@ function setupKeyboardControls(){
         const key=e.code.toLowerCase();
         if(key==='arrowleft'||key==='keya'){keys.left=true;e.preventDefault();}
         if(key==='arrowright'||key==='keyd'){keys.right=true;e.preventDefault();}
-        if((key==='arrowup'||key==='keyw'||key==='space')&&!player.isJumping){keys.up=true;setTimeout(()=>{keys.up=false},100);e.preventDefault();}
+        if((key==='arrowup'||key==='keyw'||key==='space')&&!player.isJumping){
+            keys.up=true;
+            player.velocityY=-player.jumpForce;
+            player.isJumping=true;
+            setTimeout(()=>{keys.up=false},150);
+            console.log('Keyboard jump executed! VelocityY:', player.velocityY); // Debug log
+            e.preventDefault();
+        }
         if(key==='escape'){togglePause();e.preventDefault();}
+        if(key==='f1'){ // F1 for debug toggle
+            const debugInfo = document.getElementById('debug-info');
+            if(debugInfo){
+                debugInfo.classList.toggle('hidden');
+            }
+            e.preventDefault();
+        }
     });
     
     // Handle keyup events
@@ -166,12 +210,28 @@ function updatePlayer(){
     else if(keys.right||touchControls.right){player.velocityX=player.speed;player.direction=1;}
     else{player.velocityX*=player.friction;if(Math.abs(player.velocityX)<0.1)player.velocityX=0;}
     
-    // Jump
-    if((keys.up||touchControls.up)&&!player.isJumping){player.velocityY=-player.jumpForce;player.isJumping=true;playJumpSound();}
+    // Jump - IMPROVED with direct assignment
+    if((keys.up||touchControls.up)&&!player.isJumping){
+        player.velocityY=-player.jumpForce;
+        player.isJumping=true;
+        playJumpSound();
+        console.log('Jump triggered! VelocityY:', player.velocityY, 'isJumping:', player.isJumping);
+    }
     
     // Physics
     player.velocityY+=player.gravity;
     player.x+=player.velocityX;player.y+=player.velocityY;
+    
+    // Debug position every second
+    if(Math.random()<0.01){
+        console.log('Player position:', player.x.toFixed(1), player.y.toFixed(1), 'VelocityY:', player.velocityY.toFixed(2), 'isJumping:', player.isJumping);
+    }
+    
+    // Update debug info display
+    const debugInfo = document.getElementById('debug-info');
+    if(debugInfo){
+        debugInfo.textContent = `JUMP:${player.jumpForce} | SPD:${player.speed} | Y:${player.velocityY.toFixed(1)}`;
+    }
     
     // Boundaries
     if(player.x<0)player.x=0;
@@ -204,12 +264,20 @@ function checkCollisions(){
     // Platform collisions
     [...platforms,...movingPlatforms].forEach(platform=>{
         if(rectCollide(player,platform)){
+            // Landing on platform (from above)
             if(player.velocityY>0&&player.y+player.height-player.velocityY<=platform.y+5){
-                player.y=platform.y-player.height;player.velocityY=0;player.isJumping=false;onGround=true;
+                player.y=platform.y-player.height;
+                player.velocityY=0;
+                player.isJumping=false;
+                onGround=true;
+                console.log('Landed on platform! isJumping set to false');
                 if(typeof SoundSystem!=='undefined'){SoundSystem.play('landing');}
             }
+            // Hitting platform from below
             else if(player.velocityY<0&&player.y-player.velocityY>=platform.y+platform.height-5){
-                player.y=platform.y+platform.height;player.velocityY=0;
+                player.y=platform.y+platform.height;
+                player.velocityY=0;
+                console.log('Hit platform from below!');
             }
             else if(player.velocityX>0){player.x=platform.x-player.width;}
             else if(player.velocityX<0){player.x=platform.x+platform.width;}
@@ -277,8 +345,16 @@ function playerDie(){
         // Hide death screen
         if(deathScreen){deathScreen.classList.add('hidden');}
         
-        // Respawn player
-        player.x=50;player.y=canvas.height-100;player.velocityX=0;player.velocityY=0;player.isJumping=false;
+        // Respawn player on start platform
+        const startPlatform = platforms.find(p => p.type === 'start');
+        if(startPlatform){
+            player.x = startPlatform.x + 50;
+            player.y = startPlatform.y - player.height;
+        }else{
+            player.x=50;player.y=canvas.height-150;
+        }
+        player.velocityX=0;player.velocityY=0;player.isJumping=false;
+        console.log('Player died and respawned at:', player.x, player.y);
         if(typeof saveSystem!=='undefined'){saveSystem.setCheckpoint(player.x,player.y);}
         
         // Resume game
@@ -378,7 +454,19 @@ function drawUI(){
 function togglePause(){gamePaused=!gamePaused;const pauseScreen=document.getElementById('pause-screen');if(pauseScreen){if(gamePaused){pauseScreen.classList.remove('hidden')}else{pauseScreen.classList.add('hidden')}}}
 function playJumpSound(){if(typeof SoundSystem!=='undefined'){SoundSystem.play('jump');}}
 function startGame(){if(!gameRunning){gameRunning=true;gamePaused=false;startTime=Date.now();lastTime=startTime;gameLoop();}}
-function resetGame(){deathCount=0;gameWon=false;currentTime=0;createSimpleLevel();createPlayer();if(typeof saveSystem!=='undefined'){saveSystem.setCheckpoint(player.x,player.y);}}
+function resetGame(){
+    deathCount=0;gameWon=false;currentTime=0;createSimpleLevel();createPlayer();
+    // Place player on start platform
+    const startPlatform = platforms.find(p => p.type === 'start');
+    if(startPlatform){
+        player.x = startPlatform.x + 50; // Place on start platform
+        player.y = startPlatform.y - player.height;
+        player.velocityY = 0;
+        player.isJumping = false;
+        console.log('Player respawned at:', player.x, player.y);
+    }
+    if(typeof saveSystem!=='undefined'){saveSystem.setCheckpoint(player.x,player.y);}
+}
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded',()=>{
