@@ -6,40 +6,102 @@ body{font-family:'Press Start 2P',cursive;margin:0;padding:0;overflow:hidden;use
 
 #gameCanvas{background-color:#111;display:block;cursor:crosshair;touch-action:none}
 
-/* Responsive Mobile Controls */
-@media (max-width:1024px){
-    #mobile-controls{display:flex !important}
-    #mobile-controls button{
-        min-width:64px;min-height:64px;
-        touch-action:manipulation;
-        user-select:none;
-        -webkit-user-select:none;
-    }
+/* Enhanced Mobile Controls - Force visibility and improve touch handling */
+#mobile-controls {
+    display: flex !important;
+    position: absolute !important;
+    bottom: 24px !important;
+    left: 16px !important;
+    right: 16px !important;
+    z-index: 999 !important;
+    pointer-events: none !important;
 }
 
-@media (max-width:640px){
-    #mobile-controls{
-        bottom:24px;left:16px;right:16px;
-        padding:0;
-    }
-    #mobile-controls button{
-        width:72px !important;height:72px !important;
-        font-size:28px;
-        min-width:72px !important;min-height:72px !important;
-    }
-    #jump-btn{width:88px !important;height:88px !important;min-width:88px !important;min-height:88px !important}
+#mobile-controls button {
+    pointer-events: auto !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    touch-action: manipulation !important;
+    min-width: 80px !important;
+    min-height: 80px !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    border: 3px solid !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
 }
 
-@media (min-width:1025px){
-    #mobile-controls{display:none !important}
+#jump-btn {
+    min-width: 96px !important;
+    min-height: 96px !important;
 }
 
-/* Force mobile controls to show on smaller screens */
-@media (max-width:1024px){
-    #mobile-controls{display:flex !important}
+/* Mobile controls button states */
+#mobile-controls button:active,
+#mobile-controls button.active {
+    transform: scale(0.85) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
+}
+
+/* Left/Right buttons */
+#left-btn, #right-btn {
+    background: rgba(185, 28, 28, 0.95) !important;
+    border-color: rgba(239, 68, 68, 0.9) !important;
+}
+
+#left-btn:active, #right-btn:active,
+#left-btn.active, #right-btn.active {
+    background: rgba(220, 38, 38, 1) !important;
+    border-color: rgb(255, 68, 68) !important;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.6) !important;
+}
+
+/* Jump button */
+#jump-btn {
+    background: rgba(249, 115, 22, 0.95) !important;
+    border-color: rgba(251, 146, 60, 0.9) !important;
+}
+
+#jump-btn:active, #jump-btn.active {
+    background: rgba(234, 88, 12, 1) !important;
+    border-color: rgb(251, 146, 60) !important;
+    box-shadow: 0 0 20px rgba(234, 88, 12, 0.6) !important;
+}
+
+/* Responsive sizing */
+@media (max-width: 640px) {
+    #mobile-controls button {
+        min-width: 72px !important;
+        min-height: 72px !important;
+    }
     
-    /* Hide desktop pause button on mobile */
-    #pause-btn{display:none}
+    #jump-btn {
+        min-width: 88px !important;
+        min-height: 88px !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    #mobile-controls button {
+        min-width: 80px !important;
+        min-height: 80px !important;
+    }
+    
+    #jump-btn {
+        min-width: 96px !important;
+        min-height: 96px !important;
+    }
+}
+
+/* Override any conflicting display rules */
+@media (min-width: 1025px) {
+    #mobile-controls {
+        display: flex !important;
+    }
 }
 
 /* Ensure canvas takes full screen */
