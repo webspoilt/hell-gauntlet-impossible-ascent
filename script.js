@@ -1,236 +1,393 @@
 // Game variables - optimized for performance
-let canvas,ctx,player,platforms=[],spikes=[],movingPlatforms=[],goal,particles=[],deathCount=0,startTime=0,currentTime=0,gameRunning=false,gamePaused=false,lastTime=0,level=1,achievements=[],gameWon=false;
-const keys={left:false,right:false,up:false,space:false};
-const touchControls={left:false,right:false,up:false};
+let canvas, ctx, player, platforms = [], spikes = [], movingPlatforms = [], goal, particles = [], deathCount = 0, startTime = 0, currentTime = 0, gameRunning = false, gamePaused = false, lastTime = 0, level = 1, achievements = [], gameWon = false;
+const keys = { left: false, right: false, up: false, space: false };
+const touchControls = { left: false, right: false, up: false };
 
 // Optimized initialization
-function init(){
-    canvas=document.getElementById('gameCanvas');ctx=canvas.getContext('2d');
-    resizeCanvas();window.addEventListener('resize',resizeCanvas);
-    createPlayer();createSimpleLevel();setupTouchControls();setupKeyboardControls();setupSaveSystem();
+function init() {
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    createPlayer();
+    createSimpleLevel();
+    setupTouchControls();
+    setupKeyboardControls();
+    setupSaveSystem();
     gameLoop();
 }
 
 // Player creation - FIXED JUMP PHYSICS
-function createPlayer(){
-    player={x:50,y:canvas.height-150,width:20,height:30,color:'#000000',velocityX:0,velocityY:0,speed:8,jumpForce:18,isJumping:false,gravity:0.45,maxSpeed:8,friction:0.85,direction:1};
+function createPlayer() {
+    player = {
+        x: 50,
+        y: canvas.height - 150,
+        width: 20,
+        height: 30,
+        color: '#000000',
+        velocityX: 0,
+        velocityY: 0,
+        speed: 8,
+        jumpForce: 18,
+        isJumping: false,
+        gravity: 0.45,
+        maxSpeed: 8,
+        friction: 0.85,
+        direction: 1
+    };
     console.log('Player created with jumpForce:', player.jumpForce, 'gravity:', player.gravity);
 }
 
-// Level creation - FIXED for playable jumping
-function createSimpleLevel(){
-    platforms=[];spikes=[];movingPlatforms=[];particles=[];
+// Level creation - Enhanced for better gameplay
+function createSimpleLevel() {
+    platforms = [];
+    spikes = [];
+    movingPlatforms = [];
+    particles = [];
     
     // Ground
-    platforms.push({x:0,y:canvas.height-40,width:canvas.width,height:40,color:'#333333',type:'ground'});
+    platforms.push({
+        x: 0,
+        y: canvas.height - 40,
+        width: canvas.width,
+        height: 40,
+        color: '#333333',
+        type: 'ground'
+    });
     
-    // TEST SECTION - Simple jumping test
-    platforms.push({x:0,y:canvas.height-150,width:150,height:20,color:'#44aa44',type:'start'}); // Start platform (green)
-    platforms.push({x:200,y:canvas.height-150,width:100,height:20,color:'#555555',type:'test1'}); // Easy jump
-    platforms.push({x:350,y:canvas.height-150,width:100,height:20,color:'#555555',type:'test2'}); // Easy jump
+    // Start platform (green)
+    platforms.push({
+        x: 50,
+        y: canvas.height - 150,
+        width: 120,
+        height: 20,
+        color: '#44aa44',
+        type: 'start'
+    });
     
-    // EASY practice section
-    platforms.push({x:100,y:canvas.height-200,width:80,height:20,color:'#666666',type:'practice1'});
-    platforms.push({x:220,y:canvas.height-220,width:80,height:20,color:'#666666',type:'practice2'});
-    platforms.push({x:340,y:canvas.height-240,width:80,height:20,color:'#666666',type:'practice3'});
+    // Practice section - gentle introduction
+    platforms.push({
+        x: 220,
+        y: canvas.height - 150,
+        width: 80,
+        height: 20,
+        color: '#555555',
+        type: 'practice1'
+    });
     
-    // EASY stepping stones path - REDUCED gaps and height differences
-    const steps=8,stepWidth=80,stepHeight=20,gap=120; // Reduced gap from 150 to 120
-    for(let i=0;i<steps;i++){
-        const x=250+(i*gap),y=canvas.height-150-(i*25); // Reduced height increase from 40 to 25
-        if(i!==3&&i!==6){
-            platforms.push({x:x,y:y,width:stepWidth,height:stepHeight,color:'#555555',type:'step'});
-        }
-        if(i===2||i===4||i===7){
-            spikes.push({x:x+stepWidth/2-15,y:y-25,width:30,height:25,color:'#cc0000',type:'spike'});
-        }
-    }
+    platforms.push({
+        x: 340,
+        y: canvas.height - 150,
+        width: 80,
+        height: 20,
+        color: '#555555',
+        type: 'practice2'
+    });
     
-    // Moving platform section - REPOSITIONED for accessibility
-    platforms.push({x:280,y:canvas.height-250,width:100,height:15,color:'#666666',type:'static'});
-    movingPlatforms.push({x:450,y:canvas.height-220,width:80,height:15,color:'#777777',speed:1.5,direction:1,minX:450,maxX:650,type:'moving'});
-    platforms.push({x:700,y:canvas.height-280,width:100,height:15,color:'#666666',type:'static'});
-    platforms.push({x:850,y:canvas.height-320,width:120,height:15,color:'#666666',type:'goal_platform'});
+    // Escalating challenge section
+    platforms.push({
+        x: 480,
+        y: canvas.height - 180,
+        width: 80,
+        height: 20,
+        color: '#666666',
+        type: 'challenge1'
+    });
+    
+    platforms.push({
+        x: 600,
+        y: canvas.height - 210,
+        width: 80,
+        height: 20,
+        color: '#666666',
+        type: 'challenge2'
+    });
+    
+    platforms.push({
+        x: 720,
+        y: canvas.height - 240,
+        width: 80,
+        height: 20,
+        color: '#666666',
+        type: 'challenge3'
+    });
+    
+    // Moving platform section
+    platforms.push({
+        x: 280,
+        y: canvas.height - 250,
+        width: 100,
+        height: 15,
+        color: '#666666',
+        type: 'static'
+    });
+    
+    movingPlatforms.push({
+        x: 450,
+        y: canvas.height - 220,
+        width: 80,
+        height: 15,
+        color: '#777777',
+        speed: 1.5,
+        direction: 1,
+        minX: 450,
+        maxX: 650,
+        type: 'moving'
+    });
+    
+    platforms.push({
+        x: 700,
+        y: canvas.height - 280,
+        width: 100,
+        height: 15,
+        color: '#666666',
+        type: 'static'
+    });
+    
+    platforms.push({
+        x: 850,
+        y: canvas.height - 320,
+        width: 120,
+        height: 15,
+        color: '#666666',
+        type: 'goal_platform'
+    });
     
     // Goal - ACCESSIBLE height
-    goal={x:980,y:canvas.height-380,width:40,height:60,color:'#00ff00',type:'goal',pulse:0};
+    goal = {
+        x: 980,
+        y: canvas.height - 380,
+        width: 40,
+        height: 60,
+        color: '#00ff00',
+        type: 'goal',
+        pulse: 0
+    };
     
-    // Guard spikes
-    spikes.push({x:950,y:canvas.height-25,width:40,height:25,color:'#cc0000',type:'guard'});
-    spikes.push({x:1050,y:canvas.height-25,width:40,height:25,color:'#cc0000',type:'guard'});
+    // Strategic spike placement
+    spikes.push({
+        x: 650,
+        y: canvas.height - 25,
+        width: 30,
+        height: 25,
+        color: '#cc0000',
+        type: 'warning_spike'
+    });
+    
+    spikes.push({
+        x: 780,
+        y: canvas.height - 255,
+        width: 30,
+        height: 25,
+        color: '#cc0000',
+        type: 'challenge_spike'
+    });
+    
+    spikes.push({
+        x: 950,
+        y: canvas.height - 25,
+        width: 40,
+        height: 25,
+        color: '#cc0000',
+        type: 'guard'
+    });
+    
+    spikes.push({
+        x: 1050,
+        y: canvas.height - 25,
+        width: 40,
+        height: 25,
+        color: '#cc0000',
+        type: 'guard'
+    });
 }
 
 // Canvas resize
-function resizeCanvas(){
-    canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-    if(player){player.x=Math.min(player.x,canvas.width-player.width);player.y=Math.min(player.y,canvas.height-player.height);}
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (player) {
+        player.x = Math.min(player.x, canvas.width - player.width);
+        player.y = Math.min(player.y, canvas.height - player.height);
+    }
 }
 
-// Touch controls setup - FIXED for better responsiveness
-function setupTouchControls(){
-    const leftBtn=document.getElementById('left-btn'),rightBtn=document.getElementById('right-btn'),jumpBtn=document.getElementById('jump-btn');
-    if(!leftBtn||!rightBtn||!jumpBtn){
+// Touch controls setup - COMPLETELY FIXED
+function setupTouchControls() {
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    const jumpBtn = document.getElementById('jump-btn');
+    
+    if (!leftBtn || !rightBtn || !jumpBtn) {
         console.error('Mobile buttons not found!');
         return;
     }
     
     console.log('Setting up mobile controls...');
     
-    // Helper function to prevent default touch behavior
-    const preventDefaults=(e)=>{e.preventDefault();e.stopPropagation();};
+    // Prevent default touch behaviors
+    const preventDefaults = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
     
     // Helper function to set button state
-    const setButtonState=(btn,control,active)=>{
-        touchControls[control]=active;
-        if(active){
-            btn.classList.add('active','bg-red-600');
-            btn.style.transform='scale(0.95)';
+    const setButtonState = (btn, control, active) => {
+        touchControls[control] = active;
+        if (active) {
+            btn.classList.add('active');
+            btn.style.transform = 'scale(0.9)';
             console.log(`${control} button pressed`);
-        }else{
-            btn.classList.remove('active','bg-red-600');
-            btn.style.transform='scale(1)';
+        } else {
+            btn.classList.remove('active');
+            btn.style.transform = 'scale(1)';
         }
     };
     
-    // Setup left button
-    const setupButton=(btn,control)=>{
-        // Touch events with better handling
-        btn.addEventListener('touchstart',(e)=>{
+    // Setup movement buttons
+    const setupButton = (btn, control) => {
+        // Touch events
+        btn.addEventListener('touchstart', (e) => {
             preventDefaults(e);
-            setButtonState(btn,control,true);
-        },{passive:false});
+            setButtonState(btn, control, true);
+        }, { passive: false });
         
-        btn.addEventListener('touchend',(e)=>{
+        btn.addEventListener('touchend', (e) => {
             preventDefaults(e);
-            setButtonState(btn,control,false);
-        },{passive:false});
+            setButtonState(btn, control, false);
+        }, { passive: false });
         
-        btn.addEventListener('touchcancel',(e)=>{
+        btn.addEventListener('touchcancel', (e) => {
             preventDefaults(e);
-            setButtonState(btn,control,false);
-        },{passive:false});
+            setButtonState(btn, control, false);
+        }, { passive: false });
         
-        // Mouse events for desktop testing
-        btn.addEventListener('mousedown',(e)=>{
+        // Mouse events for desktop
+        btn.addEventListener('mousedown', (e) => {
             preventDefaults(e);
-            setButtonState(btn,control,true);
+            setButtonState(btn, control, true);
         });
         
-        btn.addEventListener('mouseup',(e)=>{
+        btn.addEventListener('mouseup', (e) => {
             preventDefaults(e);
-            setButtonState(btn,control,false);
+            setButtonState(btn, control, false);
         });
         
-        btn.addEventListener('mouseleave',(e)=>{
+        btn.addEventListener('mouseleave', (e) => {
             preventDefaults(e);
-            setButtonState(btn,control,false);
+            setButtonState(btn, control, false);
         });
         
-        // Prevent context menu
-        btn.addEventListener('contextmenu',(e)=>e.preventDefault());
+        btn.addEventListener('contextmenu', (e) => e.preventDefault());
         
         console.log(`${control} button initialized`);
     };
     
-    setupButton(leftBtn,'left');
-    setupButton(rightBtn,'right');
+    setupButton(leftBtn, 'left');
+    setupButton(rightBtn, 'right');
     
     // Jump button with IMPROVED handling
-    const setupJumpButton=(btn)=>{
-        const executeJump=()=>{
+    const setupJumpButton = (btn) => {
+        const executeJump = () => {
             console.log('Jump button activated!');
-            if(!player.isJumping){
-                player.velocityY=-player.jumpForce;
-                player.isJumping=true;
-                touchControls.up=true;
-                setTimeout(()=>{touchControls.up=false},150);
-                console.log('Jump executed! VelocityY:', player.velocityY);
+            if (!player.isJumping) {
+                player.velocityY = -player.jumpForce;
+                player.isJumping = true;
+                touchControls.up = true;
                 
                 // Visual feedback
-                btn.style.transform='scale(0.95)';
-                setTimeout(()=>{btn.style.transform='scale(1)'},100);
-            }else{
+                btn.style.transform = 'scale(0.9)';
+                
+                // Reset after short delay
+                setTimeout(() => {
+                    touchControls.up = false;
+                    btn.style.transform = 'scale(1)';
+                }, 150);
+                
+                console.log('Jump executed! VelocityY:', player.velocityY);
+            } else {
                 console.log('Already jumping!');
             }
         };
         
         // Touch events
-        btn.addEventListener('touchstart',(e)=>{
+        btn.addEventListener('touchstart', (e) => {
             preventDefaults(e);
             executeJump();
-        },{passive:false});
+        }, { passive: false });
         
-        btn.addEventListener('touchend',(e)=>{
+        btn.addEventListener('touchend', (e) => {
             preventDefaults(e);
-            touchControls.up=false;
-            btn.style.transform='scale(1)';
-        },{passive:false});
+            touchControls.up = false;
+            btn.style.transform = 'scale(1)';
+        }, { passive: false });
         
-        btn.addEventListener('touchcancel',(e)=>{
+        btn.addEventListener('touchcancel', (e) => {
             preventDefaults(e);
-            touchControls.up=false;
-            btn.style.transform='scale(1)';
-        },{passive:false});
+            touchControls.up = false;
+            btn.style.transform = 'scale(1)';
+        }, { passive: false });
         
-        // Mouse events for desktop testing
-        btn.addEventListener('mousedown',(e)=>{
+        // Mouse events for desktop
+        btn.addEventListener('mousedown', (e) => {
             preventDefaults(e);
             executeJump();
         });
         
-        btn.addEventListener('mouseup',(e)=>{
+        btn.addEventListener('mouseup', (e) => {
             preventDefaults(e);
-            touchControls.up=false;
-            btn.style.transform='scale(1)';
+            touchControls.up = false;
+            btn.style.transform = 'scale(1)';
         });
         
-        btn.addEventListener('mouseleave',(e)=>{
+        btn.addEventListener('mouseleave', (e) => {
             preventDefaults(e);
-            touchControls.up=false;
-            btn.style.transform='scale(1)';
+            touchControls.up = false;
+            btn.style.transform = 'scale(1)';
         });
         
-        btn.addEventListener('contextmenu',(e)=>e.preventDefault());
+        btn.addEventListener('contextmenu', (e) => e.preventDefault());
         
         console.log('Jump button initialized');
     };
     
     setupJumpButton(jumpBtn);
     
-    // Debug mobile controls
     console.log('Mobile controls initialized successfully');
     console.log('Touch controls state:', touchControls);
-    
-    // Show mobile controls on desktop for testing
-    const mobileControls=document.getElementById('mobile-controls');
-    if(mobileControls){
-        console.log('Mobile controls element found');
-        // Force show mobile controls for debugging
-        mobileControls.style.display='flex';
-    }else{
-        console.error('Mobile controls element NOT found');
-    }
 }
 
 // Keyboard controls
-function setupKeyboardControls(){
+function setupKeyboardControls() {
     // Handle keydown events
-    document.addEventListener('keydown',(e)=>{
-        const key=e.code.toLowerCase();
-        if(key==='arrowleft'||key==='keya'){keys.left=true;e.preventDefault();}
-        if(key==='arrowright'||key==='keyd'){keys.right=true;e.preventDefault();}
-        if((key==='arrowup'||key==='keyw'||key==='space')&&!player.isJumping){
-            keys.up=true;
-            player.velocityY=-player.jumpForce;
-            player.isJumping=true;
-            setTimeout(()=>{keys.up=false},150);
-            console.log('Keyboard jump executed! VelocityY:', player.velocityY); // Debug log
+    document.addEventListener('keydown', (e) => {
+        const key = e.code.toLowerCase();
+        if (key === 'arrowleft' || key === 'keya') {
+            keys.left = true;
             e.preventDefault();
         }
-        if(key==='escape'){togglePause();e.preventDefault();}
-        if(key==='f1'){ // F1 for debug toggle
+        if (key === 'arrowright' || key === 'keyd') {
+            keys.right = true;
+            e.preventDefault();
+        }
+        if ((key === 'arrowup' || key === 'keyw' || key === 'space') && !player.isJumping) {
+            keys.up = true;
+            player.velocityY = -player.jumpForce;
+            player.isJumping = true;
+            setTimeout(() => {
+                keys.up = false;
+            }, 150);
+            console.log('Keyboard jump executed! VelocityY:', player.velocityY);
+            e.preventDefault();
+        }
+        if (key === 'escape') {
+            togglePause();
+            e.preventDefault();
+        }
+        if (key === 'f1') {
+            // F1 for debug toggle
             const debugInfo = document.getElementById('debug-info');
-            if(debugInfo){
+            if (debugInfo) {
                 debugInfo.classList.toggle('hidden');
             }
             e.preventDefault();
@@ -238,55 +395,84 @@ function setupKeyboardControls(){
     });
     
     // Handle keyup events
-    document.addEventListener('keyup',(e)=>{
-        const key=e.code.toLowerCase();
-        if(key==='arrowleft'||key==='keya'){keys.left=false;e.preventDefault();}
-        if(key==='arrowright'||key==='keyd'){keys.right=false;e.preventDefault();}
+    document.addEventListener('keyup', (e) => {
+        const key = e.code.toLowerCase();
+        if (key === 'arrowleft' || key === 'keya') {
+            keys.left = false;
+            e.preventDefault();
+        }
+        if (key === 'arrowright' || key === 'keyd') {
+            keys.right = false;
+            e.preventDefault();
+        }
     });
     
     // Add debug toggle (press D to enable debug logging)
-    document.addEventListener('keydown',(e)=>{
-        if(e.code==='KeyD' && e.shiftKey){window.debugMode=!window.debugMode;console.log('Debug mode:',window.debugMode);}
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyD' && e.shiftKey) {
+            window.debugMode = !window.debugMode;
+            console.log('Debug mode:', window.debugMode);
+        }
     });
 }
 
 // Save system setup
-function setupSaveSystem(){
-    if(typeof saveSystem!=='undefined'){
-        const savedData=saveSystem.loadGame();
-        if(savedData&&savedData.player){
-            player.x=savedData.player.x;player.y=savedData.player.y;
-            deathCount=savedData.stats.deathCount||0;
+function setupSaveSystem() {
+    if (typeof saveSystem !== 'undefined') {
+        const savedData = saveSystem.loadGame();
+        if (savedData && savedData.player) {
+            player.x = savedData.player.x;
+            player.y = savedData.player.y;
+            deathCount = savedData.stats.deathCount || 0;
         }
     }
 }
 
 // Game loop
-function gameLoop(){
-    if(!gameRunning)return;
-    const now=Date.now(),deltaTime=now-lastTime;lastTime=now;
-    if(!gamePaused){update(deltaTime);render();}
+function gameLoop() {
+    if (!gameRunning) return;
+    
+    const now = Date.now();
+    const deltaTime = now - lastTime;
+    lastTime = now;
+    
+    if (!gamePaused) {
+        update(deltaTime);
+        render();
+    }
+    
     requestAnimationFrame(gameLoop);
     
     // Debug: Check if controls are working
-    if(typeof window.debugMode==='undefined'){window.debugMode=false;}
-    if(window.debugMode && Math.random()<0.01){
-        console.log('Game running:',gameRunning,'Paused:',gamePaused,'Keys:',keys,'Touch:',touchControls);
+    if (typeof window.debugMode === 'undefined') {
+        window.debugMode = false;
+    }
+    
+    if (window.debugMode && Math.random() < 0.01) {
+        console.log('Game running:', gameRunning, 'Paused:', gamePaused, 'Keys:', keys, 'Touch:', touchControls);
     }
 }
 
 // Update game state
-function update(deltaTime){
-    updatePlayer();updateMovingPlatforms();updateParticles();
-    if(goal)goal.pulse+=deltaTime*0.01;
-    checkCollisions();checkWinCondition();
-    currentTime=Date.now()-startTime;
+function update(deltaTime) {
+    updatePlayer();
+    updateMovingPlatforms();
+    updateParticles();
+    
+    if (goal) goal.pulse += deltaTime * 0.01;
+    
+    checkCollisions();
+    checkWinCondition();
+    currentTime = Date.now() - startTime;
+    
+    // Update UI
+    updateUI();
     
     // Debug: Log control states periodically
-    if(Math.random() < 0.005) { // Every ~200 frames
+    if (Math.random() < 0.005) {
         console.log('Control States:', {
-            keys: {...keys},
-            touch: {...touchControls},
+            keys: { ...keys },
+            touch: { ...touchControls },
             player: {
                 x: player.x.toFixed(1),
                 y: player.y.toFixed(1),
@@ -297,374 +483,617 @@ function update(deltaTime){
     }
 }
 
+// Update UI
+function updateUI() {
+    const deathsCounter = document.getElementById('deaths-counter');
+    const timeCounter = document.getElementById('time-counter');
+    
+    if (deathsCounter) {
+        deathsCounter.textContent = `Deaths: ${deathCount}`;
+    }
+    
+    if (timeCounter) {
+        const timeSeconds = Math.floor(currentTime / 1000);
+        const minutes = Math.floor(timeSeconds / 60);
+        const seconds = timeSeconds % 60;
+        timeCounter.textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+}
+
 // Player update
-function updatePlayer(){
+function updatePlayer() {
     // Horizontal movement
-    if(keys.left||touchControls.left){player.velocityX=-player.speed;player.direction=-1;}
-    else if(keys.right||touchControls.right){player.velocityX=player.speed;player.direction=1;}
-    else{player.velocityX*=player.friction;if(Math.abs(player.velocityX)<0.1)player.velocityX=0;}
+    if (keys.left || touchControls.left) {
+        player.velocityX = -player.speed;
+        player.direction = -1;
+    } else if (keys.right || touchControls.right) {
+        player.velocityX = player.speed;
+        player.direction = 1;
+    } else {
+        player.velocityX *= player.friction;
+        if (Math.abs(player.velocityX) < 0.1) player.velocityX = 0;
+    }
     
     // Jump - IMPROVED with direct assignment
-    if((keys.up||touchControls.up)&&!player.isJumping){
-        player.velocityY=-player.jumpForce;
-        player.isJumping=true;
+    if ((keys.up || touchControls.up) && !player.isJumping) {
+        player.velocityY = -player.jumpForce;
+        player.isJumping = true;
         playJumpSound();
         console.log('Jump triggered! VelocityY:', player.velocityY, 'isJumping:', player.isJumping);
     }
     
     // Physics
-    player.velocityY+=player.gravity;
-    player.x+=player.velocityX;player.y+=player.velocityY;
-    
-    // Debug position every second
-    if(Math.random()<0.01){
-        console.log('Player position:', player.x.toFixed(1), player.y.toFixed(1), 'VelocityY:', player.velocityY.toFixed(2), 'isJumping:', player.isJumping);
-    }
+    player.velocityY += player.gravity;
+    player.x += player.velocityX;
+    player.y += player.velocityY;
     
     // Update debug info display
     const debugInfo = document.getElementById('debug-info');
-    if(debugInfo){
+    if (debugInfo) {
         debugInfo.textContent = `JUMP:${player.jumpForce} | SPD:${player.speed} | Y:${player.velocityY.toFixed(1)}`;
     }
     
     // Boundaries
-    if(player.x<0)player.x=0;
-    if(player.x+player.width>canvas.width)player.x=canvas.width-player.width;
+    if (player.x < 0) player.x = 0;
+    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
     
     // Death check
-    if(player.y>canvas.height+100){playerDie();}
+    if (player.y > canvas.height + 100) {
+        playerDie();
+    }
 }
 
 // Moving platforms update
-function updateMovingPlatforms(){
-    movingPlatforms.forEach(platform=>{
-        platform.x+=platform.speed*platform.direction;
-        if(platform.x<=platform.minX||platform.x+platform.width>=platform.maxX){platform.direction*=-1;}
+function updateMovingPlatforms() {
+    movingPlatforms.forEach(platform => {
+        platform.x += platform.speed * platform.direction;
+        if (platform.x <= platform.minX || platform.x + platform.width >= platform.maxX) {
+            platform.direction *= -1;
+        }
     });
 }
 
 // Particles update
-function updateParticles(){
-    particles=particles.filter(particle=>{
-        particle.x+=particle.velocityX;particle.y+=particle.velocityY;particle.life-=1;particle.size*=0.98;
-        return particle.life>0&&particle.size>0.5;
+function updateParticles() {
+    particles = particles.filter(particle => {
+        particle.x += particle.velocityX;
+        particle.y += particle.velocityY;
+        particle.life -= 1;
+        particle.size *= 0.98;
+        return particle.life > 0 && particle.size > 0.5;
     });
 }
 
 // Collision detection
-function checkCollisions(){
-    let onGround=false;
+function checkCollisions() {
+    let onGround = false;
     
     // Platform collisions
-    [...platforms,...movingPlatforms].forEach(platform=>{
-        if(rectCollide(player,platform)){
+    [...platforms, ...movingPlatforms].forEach(platform => {
+        if (rectCollide(player, platform)) {
             // Landing on platform (from above)
-            if(player.velocityY>0&&player.y+player.height-player.velocityY<=platform.y+5){
-                player.y=platform.y-player.height;
-                player.velocityY=0;
-                player.isJumping=false;
-                onGround=true;
+            if (player.velocityY > 0 && player.y + player.height - player.velocityY <= platform.y + 5) {
+                player.y = platform.y - player.height;
+                player.velocityY = 0;
+                player.isJumping = false;
+                onGround = true;
                 console.log('Landed on platform! isJumping set to false');
-                if(typeof SoundSystem!=='undefined'){SoundSystem.play('landing');}
+                if (typeof SoundSystem !== 'undefined') {
+                    SoundSystem.play('landing');
+                }
             }
             // Hitting platform from below
-            else if(player.velocityY<0&&player.y-player.velocityY>=platform.y+platform.height-5){
-                player.y=platform.y+platform.height;
-                player.velocityY=0;
+            else if (player.velocityY < 0 && player.y - player.velocityY >= platform.y + platform.height - 5) {
+                player.y = platform.y + platform.height;
+                player.velocityY = 0;
                 console.log('Hit platform from below!');
             }
-            else if(player.velocityX>0){player.x=platform.x-player.width;}
-            else if(player.velocityX<0){player.x=platform.x+platform.width;}
+            else if (player.velocityX > 0) {
+                player.x = platform.x - player.width;
+            }
+            else if (player.velocityX < 0) {
+                player.x = platform.x + platform.width;
+            }
         }
     });
     
     // Spike collisions
-    spikes.forEach(spike=>{if(rectCollide(player,spike)){playerDie();}});
+    spikes.forEach(spike => {
+        if (rectCollide(player, spike)) {
+            playerDie();
+        }
+    });
     
     // Moving platform riding
-    if(!onGround){
-        movingPlatforms.forEach(platform=>{
-            if(player.y+player.height>=platform.y&&player.y+player.height<=platform.y+10&&player.x+player.width>platform.x&&player.x<platform.x+platform.width&&player.velocityY>=0){
-                player.y=platform.y-player.height;player.velocityY=0;player.isJumping=false;player.x+=platform.speed*platform.direction*0.5;
+    if (!onGround) {
+        movingPlatforms.forEach(platform => {
+            if (player.y + player.height >= platform.y && 
+                player.y + player.height <= platform.y + 10 && 
+                player.x + player.width > platform.x && 
+                player.x < platform.x + platform.width && 
+                player.velocityY >= 0) {
+                player.y = platform.y - player.height;
+                player.velocityY = 0;
+                player.isJumping = false;
+                player.x += platform.speed * platform.direction * 0.5;
             }
         });
     }
 }
 
 // Win condition
-function checkWinCondition(){
-    if(goal&&rectCollide(player,goal)&&!gameWon){gameWon=true;showVictoryScreen();}
+function checkWinCondition() {
+    if (goal && rectCollide(player, goal) && !gameWon) {
+        gameWon = true;
+        showVictoryScreen();
+    }
 }
 
 // Collision helper
-function rectCollide(rect1,rect2){
-    return rect1.x<rect2.x+rect2.width&&rect1.x+rect1.width>rect2.x&&rect1.y<rect2.y+rect2.height&&rect1.y+rect1.height>rect2.y;
+function rectCollide(rect1, rect2) {
+    return rect1.x < rect2.x + rect2.width &&
+           rect1.x + rect1.width > rect2.x &&
+           rect1.y < rect2.y + rect2.height &&
+           rect1.y + rect1.height > rect2.y;
 }
 
 // Death
-let deathTimeout=null;
-function playerDie(){
-    deathCount++;stats.totalDeaths++;
+let deathTimeout = null;
+function playerDie() {
+    deathCount++;
+    stats.totalDeaths++;
     
-    if(typeof SoundSystem!=='undefined'){SoundSystem.play('death');}
+    if (typeof SoundSystem !== 'undefined') {
+        SoundSystem.play('death');
+    }
     
     // Clear any existing death timeout
-    if(deathTimeout){clearTimeout(deathTimeout);}
+    if (deathTimeout) {
+        clearTimeout(deathTimeout);
+    }
     
     // Blood particles
-    for(let i=0;i<15;i++){
-        particles.push({x:player.x+player.width/2,y:player.y+player.height/2,velocityX:(Math.random()-0.5)*10,velocityY:(Math.random()-0.5)*10,size:3+Math.random()*5,life:30+Math.random()*20,maxLife:50,color:'#cc0000'});
+    for (let i = 0; i < 15; i++) {
+        particles.push({
+            x: player.x + player.width / 2,
+            y: player.y + player.height / 2,
+            velocityX: (Math.random() - 0.5) * 10,
+            velocityY: (Math.random() - 0.5) * 10,
+            size: 3 + Math.random() * 5,
+            life: 30 + Math.random() * 20,
+            maxLife: 50,
+            color: '#cc0000'
+        });
     }
     
     // Stop game temporarily
-    gamePaused=true;
+    gamePaused = true;
     
     // Update death screen
-    const deathCountDisplay=document.getElementById('death-count');
-    const deathTimeDisplay=document.getElementById('death-time');
-    if(deathCountDisplay)deathCountDisplay.textContent=deathCount;
-    if(deathTimeDisplay)deathTimeDisplay.textContent=Math.floor(currentTime/1000)+'s';
+    const deathCountDisplay = document.getElementById('death-count');
+    const deathTimeDisplay = document.getElementById('death-time');
+    if (deathCountDisplay) deathCountDisplay.textContent = deathCount;
+    if (deathTimeDisplay) {
+        const timeSeconds = Math.floor(currentTime / 1000);
+        const minutes = Math.floor(timeSeconds / 60);
+        const seconds = timeSeconds % 60;
+        deathTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
     
     // Show death screen immediately
-    const deathScreen=document.getElementById('death-screen');
-    if(deathScreen){deathScreen.classList.remove('hidden');}
+    const deathScreen = document.getElementById('death-screen');
+    if (deathScreen) {
+        deathScreen.classList.remove('hidden');
+    }
     
     // Enhanced AdSense integration for maximum revenue
-    if(typeof adSenseManager!=='undefined'){
-        setTimeout(()=>{adSenseManager.showDeathScreenAd();}, 1000);
+    if (typeof adSenseManager !== 'undefined') {
+        setTimeout(() => {
+            adSenseManager.showDeathScreenAd();
+        }, 1000);
     }
     
     // Respawn after 1.5 seconds
-    deathTimeout=setTimeout(()=>{
+    deathTimeout = setTimeout(() => {
         // Hide death screen
-        if(deathScreen){deathScreen.classList.add('hidden');}
+        if (deathScreen) {
+            deathScreen.classList.add('hidden');
+        }
         
         // Respawn player on start platform
         const startPlatform = platforms.find(p => p.type === 'start');
-        if(startPlatform){
+        if (startPlatform) {
             player.x = startPlatform.x + 50;
             player.y = startPlatform.y - player.height;
-        }else{
-            player.x=50;player.y=canvas.height-150;
+        } else {
+            player.x = 50;
+            player.y = canvas.height - 150;
         }
-        player.velocityX=0;player.velocityY=0;player.isJumping=false;
+        player.velocityX = 0;
+        player.velocityY = 0;
+        player.isJumping = false;
         console.log('Player died and respawned at:', player.x, player.y);
-        if(typeof saveSystem!=='undefined'){saveSystem.setCheckpoint(player.x,player.y);}
+        
+        if (typeof saveSystem !== 'undefined') {
+            saveSystem.setCheckpoint(player.x, player.y);
+        }
         
         // Resume game
-        gamePaused=false;
+        gamePaused = false;
         
         // Focus canvas for controls
-        setTimeout(()=>{const canvas=document.getElementById('gameCanvas'); if(canvas)canvas.focus();},100);
-    },1500);
+        setTimeout(() => {
+            const canvas = document.getElementById('gameCanvas');
+            if (canvas) canvas.focus();
+        }, 100);
+    }, 1500);
 }
 
 // Victory screen
-function showVictoryScreen(){
-    const victoryScreen=document.getElementById('victory-screen');
-    const finalTime=Math.floor(currentTime/1000);
+function showVictoryScreen() {
+    const victoryScreen = document.getElementById('victory-screen');
+    const finalTime = Math.floor(currentTime / 1000);
     
-    document.getElementById('final-time').textContent=finalTime+'s';
-    document.getElementById('final-deaths').textContent=deathCount;
+    document.getElementById('final-time').textContent = finalTime + 's';
+    document.getElementById('final-deaths').textContent = deathCount;
     
-    if(typeof SoundSystem!=='undefined'){SoundSystem.play('achievement');}
+    if (typeof SoundSystem !== 'undefined') {
+        SoundSystem.play('achievement');
+    }
     
-    if(!achievements.includes('victory')){achievements.push('victory');}
-    if(victoryScreen){victoryScreen.classList.remove('hidden');}
+    if (!achievements.includes('victory')) {
+        achievements.push('victory');
+    }
+    
+    if (victoryScreen) {
+        victoryScreen.classList.remove('hidden');
+    }
     
     // Enhanced AdSense integration for victory celebration
-    if(typeof adSenseManager!=='undefined'){
-        setTimeout(()=>{adSenseManager.showVictoryScreenAd();}, 2000);
+    if (typeof adSenseManager !== 'undefined') {
+        setTimeout(() => {
+            adSenseManager.showVictoryScreenAd();
+        }, 2000);
     }
 }
 
 // Rendering
-function render(){
+function render() {
     // Clear
-    ctx.fillStyle='#1a1a1a';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // Goal
-    if(goal){
-        ctx.save();const pulse=Math.sin(goal.pulse)*0.3+0.7;
-        ctx.fillStyle=`rgba(0,255,0,${pulse})`;ctx.fillRect(goal.x,goal.y,goal.width,goal.height);
-        ctx.shadowColor='#00ff00';ctx.shadowBlur=20;ctx.fillRect(goal.x,goal.y,goal.width,goal.height);ctx.shadowBlur=0;ctx.restore();
-        ctx.fillStyle='#ffffff';ctx.font='16px Arial';ctx.textAlign='center';ctx.fillText('GOAL',goal.x+goal.width/2,goal.y-10);
+    if (goal) {
+        ctx.save();
+        const pulse = Math.sin(goal.pulse) * 0.3 + 0.7;
+        ctx.fillStyle = `rgba(0,255,0,${pulse})`;
+        ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+        ctx.shadowColor = '#00ff00';
+        ctx.shadowBlur = 20;
+        ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('GOAL', goal.x + goal.width / 2, goal.y - 10);
     }
     
     // Platforms
-    platforms.forEach(platform=>{ctx.fillStyle=platform.color;ctx.fillRect(platform.x,platform.y,platform.width,platform.height);});
-    movingPlatforms.forEach(platform=>{ctx.fillStyle=platform.color;ctx.fillRect(platform.x,platform.y,platform.width,platform.height);});
+    platforms.forEach(platform => {
+        ctx.fillStyle = platform.color;
+        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    });
+    
+    movingPlatforms.forEach(platform => {
+        ctx.fillStyle = platform.color;
+        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+    });
     
     // Spikes
-    spikes.forEach(spike=>{ctx.fillStyle=spike.color;
-        ctx.beginPath();ctx.moveTo(spike.x,spike.y+spike.height);ctx.lineTo(spike.x+spike.width/2,spike.y);ctx.lineTo(spike.x+spike.width,spike.y+spike.height);ctx.closePath();ctx.fill();});
+    spikes.forEach(spike => {
+        ctx.fillStyle = spike.color;
+        ctx.beginPath();
+        ctx.moveTo(spike.x, spike.y + spike.height);
+        ctx.lineTo(spike.x + spike.width / 2, spike.y);
+        ctx.lineTo(spike.x + spike.width, spike.y + spike.height);
+        ctx.closePath();
+        ctx.fill();
+    });
     
     // Character
     draw2DCharacter();
     
     // Particles
-    particles.forEach(particle=>{const alpha=particle.life/particle.maxLife;ctx.fillStyle=particle.color.replace('cc',Math.floor(alpha*204));ctx.beginPath();ctx.arc(particle.x,particle.y,particle.size,0,Math.PI*2);ctx.fill();});
+    particles.forEach(particle => {
+        const alpha = particle.life / particle.maxLife;
+        ctx.fillStyle = particle.color.replace('cc', Math.floor(alpha * 204));
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
     
     // UI
     drawUI();
 }
 
 // Character drawing
-function draw2DCharacter(){
+function draw2DCharacter() {
     ctx.save();
+    
     // Shadow
-    ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(player.x+player.width/2,player.y+player.height,player.width/2,5,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(player.x + player.width / 2, player.y + player.height, player.width / 2, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
     // Body
-    ctx.fillStyle='#000000';ctx.fillRect(player.x,player.y+8,player.width,player.height-8);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(player.x, player.y + 8, player.width, player.height - 8);
+    
     // Head
-    ctx.fillStyle='#000000';ctx.beginPath();ctx.arc(player.x+player.width/2,player.y+6,8,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.arc(player.x + player.width / 2, player.y + 6, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
     // Eyes
-    ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(player.x+player.width/2-3,player.y+4,1.5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(player.x+player.width/2+3,player.y+4,1.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(player.x + player.width / 2 - 3, player.y + 4, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(player.x + player.width / 2 + 3, player.y + 4, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    
     ctx.restore();
 }
 
 // UI rendering
-function drawUI(){
-    ctx.fillStyle='#ffffff';ctx.font='20px Arial';ctx.textAlign='left';
-    ctx.fillText(`Deaths: ${deathCount}`,20,30);
-    const timeSeconds=Math.floor(currentTime/1000);ctx.fillText(`Time: ${timeSeconds}s`,20,55);
+function drawUI() {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'left';
     
-    if(currentTime<5000&&!gameWon){
-        ctx.fillStyle='#ffffff';ctx.font='16px Arial';ctx.textAlign='center';
-        ctx.fillText('← → to move, Space to jump',canvas.width/2,50);
-        ctx.fillText('Reach the GREEN GOAL!',canvas.width/2,75);
+    const timeSeconds = Math.floor(currentTime / 1000);
+    const minutes = Math.floor(timeSeconds / 60);
+    const seconds = timeSeconds % 60;
+    
+    ctx.fillText(`Deaths: ${deathCount}`, 20, 30);
+    ctx.fillText(`Time: ${minutes}:${seconds.toString().padStart(2, '0')}`, 20, 55);
+    
+    if (currentTime < 5000 && !gameWon) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('← → to move, Space to jump', canvas.width / 2, 50);
+        ctx.fillText('Reach the GREEN GOAL!', canvas.width / 2, 75);
     }
     
-    if(gameWon){
-        ctx.fillStyle='#00ff00';ctx.font='32px Arial';ctx.textAlign='center';
-        ctx.fillText('YOU WIN!',canvas.width/2,canvas.height/2-20);
-        ctx.font='18px Arial';
-        ctx.fillText(`Time: ${Math.floor(currentTime/1000)}s | Deaths: ${deathCount}`,canvas.width/2,canvas.height/2+10);
+    if (gameWon) {
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '32px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('YOU WIN!', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.font = '18px Arial';
+        ctx.fillText(`Time: ${Math.floor(currentTime / 1000)}s | Deaths: ${deathCount}`, canvas.width / 2, canvas.height / 2 + 10);
     }
 }
 
 // Controls
-function togglePause(){gamePaused=!gamePaused;const pauseScreen=document.getElementById('pause-screen');if(pauseScreen){if(gamePaused){pauseScreen.classList.remove('hidden')}else{pauseScreen.classList.add('hidden')}}}
-function playJumpSound(){if(typeof SoundSystem!=='undefined'){SoundSystem.play('jump');}}
-function startGame(){if(!gameRunning){gameRunning=true;gamePaused=false;startTime=Date.now();lastTime=startTime;gameLoop();}}
-function resetGame(){
-    deathCount=0;gameWon=false;currentTime=0;createSimpleLevel();createPlayer();
+function togglePause() {
+    gamePaused = !gamePaused;
+    const pauseScreen = document.getElementById('pause-screen');
+    if (pauseScreen) {
+        if (gamePaused) {
+            pauseScreen.classList.remove('hidden');
+        } else {
+            pauseScreen.classList.add('hidden');
+        }
+    }
+}
+
+function playJumpSound() {
+    if (typeof SoundSystem !== 'undefined') {
+        SoundSystem.play('jump');
+    }
+}
+
+function startGame() {
+    if (!gameRunning) {
+        gameRunning = true;
+        gamePaused = false;
+        startTime = Date.now();
+        lastTime = startTime;
+        gameLoop();
+    }
+}
+
+function resetGame() {
+    deathCount = 0;
+    gameWon = false;
+    currentTime = 0;
+    createSimpleLevel();
+    createPlayer();
+    
     // Place player on start platform
     const startPlatform = platforms.find(p => p.type === 'start');
-    if(startPlatform){
-        player.x = startPlatform.x + 50; // Place on start platform
+    if (startPlatform) {
+        player.x = startPlatform.x + 50;
         player.y = startPlatform.y - player.height;
         player.velocityY = 0;
         player.isJumping = false;
         console.log('Player respawned at:', player.x, player.y);
     }
-    if(typeof saveSystem!=='undefined'){saveSystem.setCheckpoint(player.x,player.y);}
+    
+    if (typeof saveSystem !== 'undefined') {
+        saveSystem.setCheckpoint(player.x, player.y);
+    }
 }
 
 // Initialize on load
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', () => {
     // Debug information
-    const isMobile=/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    console.log('Device detected:',isMobile ? 'Mobile' : 'Desktop');
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('Device detected:', isMobile ? 'Mobile' : 'Desktop');
     
     // Add canvas focus for keyboard input
-    const canvas=document.getElementById('gameCanvas');
-    if(canvas){canvas.setAttribute('tabindex', '0');}
+    const canvas = document.getElementById('gameCanvas');
+    if (canvas) {
+        canvas.setAttribute('tabindex', '0');
+    }
     
     // Enhanced debug for mobile controls
-    const mobileControls=document.getElementById('mobile-controls');
-    if(mobileControls){
+    const mobileControls = document.getElementById('mobile-controls');
+    if (mobileControls) {
         console.log('Mobile controls element found and visible');
         console.log('Left button:', document.getElementById('left-btn'));
         console.log('Right button:', document.getElementById('right-btn'));
         console.log('Jump button:', document.getElementById('jump-btn'));
-    }else{
+    } else {
         console.error('Mobile controls element NOT found');
     }
     
     // Start button
-    const startBtn=document.getElementById('start-btn');
-    if(startBtn){startBtn.addEventListener('click',()=>{
-        console.log('Start button clicked');
-        const startScreen=document.getElementById('start-screen');
-        if(startScreen)startScreen.classList.add('hidden');
-        startGame(); 
-        if(canvas)canvas.focus();
-    });}
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            console.log('Start button clicked');
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) startScreen.classList.add('hidden');
+            startGame();
+            if (canvas) canvas.focus();
+        });
+    }
     
     // Retry button (death screen)
-    const retryBtn=document.getElementById('retry-btn');
-    if(retryBtn){retryBtn.addEventListener('click',()=>{
-        console.log('Retry button clicked');
-        const deathScreen=document.getElementById('death-screen');
-        if(deathScreen)deathScreen.classList.add('hidden');
-        resetGame();startGame();
-        if(canvas)canvas.focus();
-    });}
+    const retryBtn = document.getElementById('retry-btn');
+    if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+            console.log('Retry button clicked');
+            const deathScreen = document.getElementById('death-screen');
+            if (deathScreen) deathScreen.classList.add('hidden');
+            resetGame();
+            startGame();
+            if (canvas) canvas.focus();
+        });
+    }
     
     // Pause button
-    const pauseBtn=document.getElementById('pause-btn');
-    if(pauseBtn){pauseBtn.addEventListener('click',()=>{console.log('Pause button clicked');togglePause();});}
+    const pauseBtn = document.getElementById('pause-btn');
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => {
+            console.log('Pause button clicked');
+            togglePause();
+        });
+    }
     
     // Resume button
-    const resumeBtn=document.getElementById('resume-btn');
-    if(resumeBtn){resumeBtn.addEventListener('click',()=>{console.log('Resume button clicked');togglePause(); if(canvas)canvas.focus();});}
+    const resumeBtn = document.getElementById('resume-btn');
+    if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => {
+            console.log('Resume button clicked');
+            togglePause();
+            if (canvas) canvas.focus();
+        });
+    }
     
     // Give up button
-    const quitBtn=document.getElementById('quit-btn');
-    if(quitBtn){quitBtn.addEventListener('click',()=>{
-        console.log('Quit button clicked');
-        const pauseScreen=document.getElementById('pause-screen');
-        if(pauseScreen)pauseScreen.classList.add('hidden');
-        const startScreen=document.getElementById('start-screen');
-        if(startScreen)startScreen.classList.remove('hidden');
-        gameRunning=false;gamePaused=false;resetGame();
-    });}
+    const quitBtn = document.getElementById('quit-btn');
+    if (quitBtn) {
+        quitBtn.addEventListener('click', () => {
+            console.log('Quit button clicked');
+            const pauseScreen = document.getElementById('pause-screen');
+            if (pauseScreen) pauseScreen.classList.add('hidden');
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) startScreen.classList.remove('hidden');
+            gameRunning = false;
+            gamePaused = false;
+            resetGame();
+        });
+    }
     
     // Main menu button (multiple locations)
-    const mainMenuBtns=['main-menu-btn','victory-main-menu-btn'];
-    mainMenuBtns.forEach(btnId=>{
-        const mainMenuBtn=document.getElementById(btnId);
-        if(mainMenuBtn){mainMenuBtn.addEventListener('click',()=>{
-            console.log('Main menu button clicked:',btnId);
-            const pauseScreen=document.getElementById('pause-screen'),deathScreen=document.getElementById('death-screen'),victoryScreen=document.getElementById('victory-screen');
-            [pauseScreen,deathScreen,victoryScreen].forEach(screen=>{if(screen)screen.classList.add('hidden');});
-            const startScreen=document.getElementById('start-screen');if(startScreen)startScreen.classList.remove('hidden');
-            gameRunning=false;gamePaused=false;resetGame();
-        });}
+    const mainMenuBtns = ['main-menu-btn', 'victory-main-menu-btn'];
+    mainMenuBtns.forEach(btnId => {
+        const mainMenuBtn = document.getElementById(btnId);
+        if (mainMenuBtn) {
+            mainMenuBtn.addEventListener('click', () => {
+                console.log('Main menu button clicked:', btnId);
+                const pauseScreen = document.getElementById('pause-screen');
+                const deathScreen = document.getElementById('death-screen');
+                const victoryScreen = document.getElementById('victory-screen');
+                [pauseScreen, deathScreen, victoryScreen].forEach(screen => {
+                    if (screen) screen.classList.add('hidden');
+                });
+                const startScreen = document.getElementById('start-screen');
+                if (startScreen) startScreen.classList.remove('hidden');
+                gameRunning = false;
+                gamePaused = false;
+                resetGame();
+            });
+        }
     });
     
     // Victory screen buttons
-    const playAgainBtn=document.getElementById('play-again-btn');
-    if(playAgainBtn){playAgainBtn.addEventListener('click',()=>{
-        console.log('Play again button clicked');
-        const victoryScreen=document.getElementById('victory-screen');
-        if(victoryScreen)victoryScreen.classList.add('hidden');
-        resetGame();startGame();
-        if(canvas)canvas.focus();
-    });}
+    const playAgainBtn = document.getElementById('play-again-btn');
+    if (playAgainBtn) {
+        playAgainBtn.addEventListener('click', () => {
+            console.log('Play again button clicked');
+            const victoryScreen = document.getElementById('victory-screen');
+            if (victoryScreen) victoryScreen.classList.add('hidden');
+            resetGame();
+            startGame();
+            if (canvas) canvas.focus();
+        });
+    }
     
     // Save button
-    const saveBtn=document.getElementById('save-btn');
-    if(saveBtn){saveBtn.addEventListener('click',()=>{
-        console.log('Save button clicked');
-        if(typeof saveSystem!=='undefined'){
-            saveSystem.saveGame({player:{x:player.x,y:player.y},stats:{deathCount,currentTime},achievements});
-            alert('Game saved!');
-        }
-    });}
+    const saveBtn = document.getElementById('save-btn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            console.log('Save button clicked');
+            if (typeof saveSystem !== 'undefined') {
+                saveSystem.saveGame({
+                    player: { x: player.x, y: player.y },
+                    stats: { deathCount, currentTime },
+                    achievements
+                });
+                alert('Game saved!');
+            }
+        });
+    }
     
     // Initialize game
     init();
     
     // Add canvas click to focus for keyboard input
-    if(canvas){canvas.addEventListener('click',()=>{console.log('Canvas clicked - focusing');canvas.focus();});}
+    if (canvas) {
+        canvas.addEventListener('click', () => {
+            console.log('Canvas clicked - focusing');
+            canvas.focus();
+        });
+    }
     
     // Prevent default touch behaviors that might interfere
-    document.addEventListener('touchstart',(e)=>{if(e.target.tagName!=='BUTTON' && e.target.tagName!=='CANVAS'){e.preventDefault();}},{passive:false});
-    document.addEventListener('touchmove',(e)=>{if(e.target.tagName!=='BUTTON' && e.target.tagName!=='CANVAS'){e.preventDefault();}},{passive:false});
+    document.addEventListener('touchstart', (e) => {
+        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'CANVAS') {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'CANVAS') {
+            e.preventDefault();
+        }
+    }, { passive: false });
     
     // Auto-focus canvas when game starts
-    setTimeout(()=>{if(canvas && gameRunning){console.log('Auto-focusing canvas');canvas.focus();}},200);
+    setTimeout(() => {
+        if (canvas && gameRunning) {
+            console.log('Auto-focusing canvas');
+            canvas.focus();
+        }
+    }, 200);
 });
