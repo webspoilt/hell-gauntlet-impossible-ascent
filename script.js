@@ -66,69 +66,149 @@ function resizeCanvas(){
     if(player){player.x=Math.min(player.x,canvas.width-player.width);player.y=Math.min(player.y,canvas.height-player.height);}
 }
 
-// Touch controls setup
+// Touch controls setup - FIXED for better responsiveness
 function setupTouchControls(){
     const leftBtn=document.getElementById('left-btn'),rightBtn=document.getElementById('right-btn'),jumpBtn=document.getElementById('jump-btn');
-    if(!leftBtn||!rightBtn||!jumpBtn)return;
+    if(!leftBtn||!rightBtn||!jumpBtn){
+        console.error('Mobile buttons not found!');
+        return;
+    }
+    
+    console.log('Setting up mobile controls...');
     
     // Helper function to prevent default touch behavior
     const preventDefaults=(e)=>{e.preventDefault();e.stopPropagation();};
     
-    // Left button
+    // Helper function to set button state
+    const setButtonState=(btn,control,active)=>{
+        touchControls[control]=active;
+        if(active){
+            btn.classList.add('active','bg-red-600');
+            btn.style.transform='scale(0.95)';
+            console.log(`${control} button pressed`);
+        }else{
+            btn.classList.remove('active','bg-red-600');
+            btn.style.transform='scale(1)';
+        }
+    };
+    
+    // Setup left button
     const setupButton=(btn,control)=>{
         // Touch events with better handling
-        btn.addEventListener('touchstart',(e)=>{preventDefaults(e);touchControls[control]=true;btn.classList.add('active')},{passive:false});
-        btn.addEventListener('touchend',(e)=>{preventDefaults(e);touchControls[control]=false;btn.classList.remove('active')},{passive:false});
-        btn.addEventListener('touchcancel',(e)=>{preventDefaults(e);touchControls[control]=false;btn.classList.remove('active')},{passive:false});
+        btn.addEventListener('touchstart',(e)=>{
+            preventDefaults(e);
+            setButtonState(btn,control,true);
+        },{passive:false});
+        
+        btn.addEventListener('touchend',(e)=>{
+            preventDefaults(e);
+            setButtonState(btn,control,false);
+        },{passive:false});
+        
+        btn.addEventListener('touchcancel',(e)=>{
+            preventDefaults(e);
+            setButtonState(btn,control,false);
+        },{passive:false});
         
         // Mouse events for desktop testing
-        btn.addEventListener('mousedown',(e)=>{preventDefaults(e);touchControls[control]=true;btn.classList.add('active')});
-        btn.addEventListener('mouseup',(e)=>{preventDefaults(e);touchControls[control]=false;btn.classList.remove('active')});
-        btn.addEventListener('mouseleave',(e)=>{preventDefaults(e);touchControls[control]=false;btn.classList.remove('active')});
+        btn.addEventListener('mousedown',(e)=>{
+            preventDefaults(e);
+            setButtonState(btn,control,true);
+        });
+        
+        btn.addEventListener('mouseup',(e)=>{
+            preventDefaults(e);
+            setButtonState(btn,control,false);
+        });
+        
+        btn.addEventListener('mouseleave',(e)=>{
+            preventDefaults(e);
+            setButtonState(btn,control,false);
+        });
         
         // Prevent context menu
         btn.addEventListener('contextmenu',(e)=>e.preventDefault());
+        
+        console.log(`${control} button initialized`);
     };
     
     setupButton(leftBtn,'left');
     setupButton(rightBtn,'right');
     
     // Jump button with IMPROVED handling
-    jumpBtn.addEventListener('touchstart',(e)=>{
-        preventDefaults(e);
-        console.log('Jump button pressed!'); // Debug log
-        if(!player.isJumping){
-            player.velocityY=-player.jumpForce;
-            player.isJumping=true;
-            touchControls.up=true;
-            setTimeout(()=>{touchControls.up=false},150);
-            console.log('Jump executed! VelocityY:', player.velocityY); // Debug log
-        }
-    },{passive:false});
+    const setupJumpButton=(btn)=>{
+        const executeJump=()=>{
+            console.log('Jump button activated!');
+            if(!player.isJumping){
+                player.velocityY=-player.jumpForce;
+                player.isJumping=true;
+                touchControls.up=true;
+                setTimeout(()=>{touchControls.up=false},150);
+                console.log('Jump executed! VelocityY:', player.velocityY);
+                
+                // Visual feedback
+                btn.style.transform='scale(0.95)';
+                setTimeout(()=>{btn.style.transform='scale(1)'},100);
+            }else{
+                console.log('Already jumping!');
+            }
+        };
+        
+        // Touch events
+        btn.addEventListener('touchstart',(e)=>{
+            preventDefaults(e);
+            executeJump();
+        },{passive:false});
+        
+        btn.addEventListener('touchend',(e)=>{
+            preventDefaults(e);
+            touchControls.up=false;
+            btn.style.transform='scale(1)';
+        },{passive:false});
+        
+        btn.addEventListener('touchcancel',(e)=>{
+            preventDefaults(e);
+            touchControls.up=false;
+            btn.style.transform='scale(1)';
+        },{passive:false});
+        
+        // Mouse events for desktop testing
+        btn.addEventListener('mousedown',(e)=>{
+            preventDefaults(e);
+            executeJump();
+        });
+        
+        btn.addEventListener('mouseup',(e)=>{
+            preventDefaults(e);
+            touchControls.up=false;
+            btn.style.transform='scale(1)';
+        });
+        
+        btn.addEventListener('mouseleave',(e)=>{
+            preventDefaults(e);
+            touchControls.up=false;
+            btn.style.transform='scale(1)';
+        });
+        
+        btn.addEventListener('contextmenu',(e)=>e.preventDefault());
+        
+        console.log('Jump button initialized');
+    };
     
-    jumpBtn.addEventListener('touchend',(e)=>{preventDefaults(e);touchControls.up=false},{passive:false});
-    jumpBtn.addEventListener('touchcancel',(e)=>{preventDefaults(e);touchControls.up=false},{passive:false});
-    
-    jumpBtn.addEventListener('mousedown',(e)=>{
-        preventDefaults(e);
-        console.log('Jump button clicked!'); // Debug log
-        if(!player.isJumping){
-            player.velocityY=-player.jumpForce;
-            player.isJumping=true;
-            touchControls.up=true;
-            setTimeout(()=>{touchControls.up=false},150);
-            console.log('Jump executed! VelocityY:', player.velocityY); // Debug log
-        }
-    });
-    
-    jumpBtn.addEventListener('mouseup',(e)=>{preventDefaults(e);touchControls.up=false});
-    jumpBtn.addEventListener('mouseleave',(e)=>{preventDefaults(e);touchControls.up=false});
-    jumpBtn.addEventListener('contextmenu',(e)=>e.preventDefault());
+    setupJumpButton(jumpBtn);
     
     // Debug mobile controls
-    console.log('Mobile controls initialized');
-    if(!/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-        console.log('Desktop detected - mobile controls may not be visible');
+    console.log('Mobile controls initialized successfully');
+    console.log('Touch controls state:', touchControls);
+    
+    // Show mobile controls on desktop for testing
+    const mobileControls=document.getElementById('mobile-controls');
+    if(mobileControls){
+        console.log('Mobile controls element found');
+        // Force show mobile controls for debugging
+        mobileControls.style.display='flex';
+    }else{
+        console.error('Mobile controls element NOT found');
     }
 }
 
@@ -201,6 +281,20 @@ function update(deltaTime){
     if(goal)goal.pulse+=deltaTime*0.01;
     checkCollisions();checkWinCondition();
     currentTime=Date.now()-startTime;
+    
+    // Debug: Log control states periodically
+    if(Math.random() < 0.005) { // Every ~200 frames
+        console.log('Control States:', {
+            keys: {...keys},
+            touch: {...touchControls},
+            player: {
+                x: player.x.toFixed(1),
+                y: player.y.toFixed(1),
+                velocityY: player.velocityY.toFixed(2),
+                isJumping: player.isJumping
+            }
+        });
+    }
 }
 
 // Player update
@@ -478,9 +572,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     const canvas=document.getElementById('gameCanvas');
     if(canvas){canvas.setAttribute('tabindex', '0');}
     
-    // Debug mobile controls
+    // Enhanced debug for mobile controls
     const mobileControls=document.getElementById('mobile-controls');
-    if(mobileControls){console.log('Mobile controls element found');}else{console.log('Mobile controls element NOT found');}
+    if(mobileControls){
+        console.log('Mobile controls element found and visible');
+        console.log('Left button:', document.getElementById('left-btn'));
+        console.log('Right button:', document.getElementById('right-btn'));
+        console.log('Jump button:', document.getElementById('jump-btn'));
+    }else{
+        console.error('Mobile controls element NOT found');
+    }
     
     // Start button
     const startBtn=document.getElementById('start-btn');
