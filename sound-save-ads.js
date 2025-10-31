@@ -1,320 +1,401 @@
-// Sound effects using Web Audio API (completely free!)
-class SoundEffects {
+// Sound Effects and Save System with AdSense Integration
+// Optimized for free hosting on GitHub Pages
+
+class SoundSystem {
     constructor() {
-        this.audioContext = null;
-        this.initialized = false;
+        this.sounds = {};
+        this.muted = false;
+        this.context = null;
+        this.initAudioContext();
+        this.loadSounds();
     }
     
-    init() {
-        if (!this.initialized) {
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            this.initialized = true;
+    initAudioContext() {
+        try {
+            this.context = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Web Audio API not supported');
         }
     }
     
-    // Death sound effect
-    playDeath() {
-        this.init();
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(50, this.audioContext.currentTime + 0.5);
-        
-        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
-        
-        oscillator.type = 'sawtooth';
-        oscillator.start();
-        oscillator.stop(this.audioContext.currentTime + 0.5);
+    loadSounds() {
+        // Create synthetic sounds using Web Audio API (free!)
+        this.createSyntheticSounds();
     }
     
-    // Jump sound effect
-    playJump() {
-        this.init();
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+    createSyntheticSounds() {
+        // Jump sound - short ascending tone
+        this.sounds.jump = () => {
+            if (this.muted || !this.context) return;
+            
+            const oscillator = this.context.createOscillator();
+            const gainNode = this.context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.context.destination);
+            
+            oscillator.frequency.setValueAtTime(400, this.context.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(600, this.context.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.1, this.context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.1);
+            
+            oscillator.start(this.context.currentTime);
+            oscillator.stop(this.context.currentTime + 0.1);
+        };
         
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
+        // Landing sound - low thud
+        this.sounds.landing = () => {
+            if (this.muted || !this.context) return;
+            
+            const oscillator = this.context.createOscillator();
+            const gainNode = this.context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.context.destination);
+            
+            oscillator.frequency.setValueAtTime(150, this.context.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(100, this.context.currentTime + 0.05);
+            
+            gainNode.gain.setValueAtTime(0.1, this.context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.05);
+            
+            oscillator.start(this.context.currentTime);
+            oscillator.stop(this.context.currentTime + 0.05);
+        };
         
-        oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(600, this.audioContext.currentTime + 0.1);
+        // Death sound - dramatic downward tone
+        this.sounds.death = () => {
+            if (this.muted || !this.context) return;
+            
+            const oscillator = this.context.createOscillator();
+            const gainNode = this.context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.context.destination);
+            
+            oscillator.frequency.setValueAtTime(300, this.context.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(50, this.context.currentTime + 0.5);
+            
+            gainNode.gain.setValueAtTime(0.2, this.context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.5);
+            
+            oscillator.start(this.context.currentTime);
+            oscillator.stop(this.context.currentTime + 0.5);
+        };
         
-        gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        // Achievement sound - uplifting melody
+        this.sounds.achievement = () => {
+            if (this.muted || !this.context) return;
+            
+            const frequencies = [523, 659, 784, 1047]; // C, E, G, C
+            frequencies.forEach((freq, index) => {
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+                
+                oscillator.frequency.setValueAtTime(freq, this.context.currentTime + index * 0.1);
+                
+                gainNode.gain.setValueAtTime(0, this.context.currentTime + index * 0.1);
+                gainNode.gain.linearRampToValueAtTime(0.1, this.context.currentTime + index * 0.1 + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + index * 0.1 + 0.3);
+                
+                oscillator.start(this.context.currentTime + index * 0.1);
+                oscillator.stop(this.context.currentTime + index * 0.1 + 0.3);
+            });
+        };
         
-        oscillator.type = 'square';
-        oscillator.start();
-        oscillator.stop(this.audioContext.currentTime + 0.1);
+        // Button click sound
+        this.sounds.click = () => {
+            if (this.muted || !this.context) return;
+            
+            const oscillator = this.context.createOscillator();
+            const gainNode = this.context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.context.destination);
+            
+            oscillator.frequency.setValueAtTime(800, this.context.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.05, this.context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.1);
+            
+            oscillator.start(this.context.currentTime);
+            oscillator.stop(this.context.currentTime + 0.1);
+        };
     }
     
-    // Achievement sound
-    playAchievement() {
-        this.init();
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
-        oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.1);
-        oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.2);
-        
-        gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
-        
-        oscillator.type = 'sine';
-        oscillator.start();
-        oscillator.stop(this.audioContext.currentTime + 0.3);
-    }
-    
-    // Landing sound
-    playLanding() {
-        this.init();
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(100, this.audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(50, this.audioContext.currentTime + 0.1);
-        
-        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
-        
-        oscillator.type = 'triangle';
-        oscillator.start();
-        oscillator.stop(this.audioContext.currentTime + 0.1);
-    }
-    
-    // Screen shake sound (subtle)
-    playScreenShake() {
-        this.init();
-        const noise = this.audioContext.createBufferSource();
-        const bufferSize = this.audioContext.sampleRate * 0.1;
-        const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
-        const data = buffer.getChannelData(0);
-        
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
+    play(soundName) {
+        if (this.sounds[soundName]) {
+            this.sounds[soundName]();
         }
-        
-        const gainNode = this.audioContext.createGain();
-        noise.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        
-        gainNode.gain.setValueAtTime(0.05, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
-        
-        noise.buffer = buffer;
-        noise.start();
-        noise.stop(this.audioContext.currentTime + 0.1);
+    }
+    
+    toggleMute() {
+        this.muted = !this.muted;
+        return this.muted;
     }
 }
 
-// Save system using localStorage (completely free!)
+// Save System with Checkpoints
 class SaveSystem {
     constructor() {
-        this.saveKey = 'hellsGauntletSave';
-        this.loadGame();
+        this.saveKey = 'hells-gauntlet-save';
+        this.checkpointKey = 'hells-gauntlet-checkpoint';
     }
     
-    // Save game state
-    saveGame() {
-        const saveData = {
-            deathCount: deathCount,
-            totalDeaths: stats.totalDeaths,
-            longestSurvival: stats.longestSurvival,
-            bestTime: stats.bestTime,
-            achievements: achievements,
-            level: level,
-            playerPosition: {
-                x: player.x,
-                y: player.y
-            },
-            lastPlayed: Date.now(),
-            gameSettings: {
-                soundEnabled: this.soundEnabled || true,
-                difficulty: difficultyMultiplier
-            }
-        };
-        
+    saveGame(gameData) {
         try {
-            localStorage.setItem(this.saveKey, JSON.stringify(saveData));
+            localStorage.setItem(this.saveKey, JSON.stringify({
+                ...gameData,
+                saveTime: new Date().toISOString(),
+                version: '1.0'
+            }));
+            return true;
         } catch (e) {
             console.log('Save failed:', e);
+            return false;
         }
     }
     
-    // Load game state
     loadGame() {
         try {
             const saved = localStorage.getItem(this.saveKey);
-            if (saved) {
-                const saveData = JSON.parse(saved);
-                deathCount = saveData.deathCount || 0;
-                stats.totalDeaths = saveData.totalDeaths || 0;
-                stats.longestSurvival = saveData.longestSurvival || 0;
-                stats.bestTime = saveData.bestTime || Infinity;
-                achievements = saveData.achievements || [];
-                level = saveData.level || 1;
-                this.soundEnabled = saveData.gameSettings?.soundEnabled !== false;
-            }
+            return saved ? JSON.parse(saved) : null;
         } catch (e) {
             console.log('Load failed:', e);
-            this.resetGame();
+            return null;
         }
     }
     
-    // Reset save
-    resetGame() {
-        localStorage.removeItem(this.saveKey);
-        deathCount = 0;
-        stats.totalDeaths = 0;
-        stats.longestSurvival = 0;
-        stats.bestTime = Infinity;
-        achievements = [];
-        level = 1;
-    }
-    
-    // Auto-save periodically
-    startAutoSave() {
-        setInterval(() => {
-            if (gameRunning) {
-                this.saveGame();
-            }
-        }, 5000); // Save every 5 seconds
-    }
-    
-    // Checkpoint system
     setCheckpoint(x, y) {
-        this.lastCheckpoint = { x, y, timestamp: Date.now() };
+        try {
+            localStorage.setItem(this.checkpointKey, JSON.stringify({
+                x: x,
+                y: y,
+                timestamp: new Date().toISOString()
+            }));
+        } catch (e) {
+            console.log('Checkpoint save failed:', e);
+        }
     }
     
     getCheckpoint() {
-        return this.lastCheckpoint;
+        try {
+            const checkpoint = localStorage.getItem(this.checkpointKey);
+            return checkpoint ? JSON.parse(checkpoint) : null;
+        } catch (e) {
+            console.log('Checkpoint load failed:', e);
+            return null;
+        }
+    }
+    
+    clearSave() {
+        localStorage.removeItem(this.saveKey);
+        localStorage.removeItem(this.checkpointKey);
     }
 }
 
-// Google AdSense integration
-class AdManager {
+// Statistics tracking for achievements
+const stats = {
+    totalDeaths: 0,
+    totalPlayTime: 0,
+    levelsCompleted: 0,
+    achievements: [],
+    
+    addDeath() {
+        this.totalDeaths++;
+        this.checkAchievements();
+    },
+    
+    addPlayTime(seconds) {
+        this.totalPlayTime += seconds;
+        this.checkAchievements();
+    },
+    
+    checkAchievements() {
+        // Death milestones
+        if (this.totalDeaths >= 10 && !this.achievements.includes('die_10_times')) {
+            this.achievements.push('die_10_times');
+            this.showAchievement('🎯 DIED 10 TIMES');
+        }
+        
+        if (this.totalDeaths >= 50 && !this.achievements.includes('die_50_times')) {
+            this.achievements.push('die_50_times');
+            this.showAchievement('💀 DIED 50 TIMES');
+        }
+        
+        if (this.totalDeaths >= 100 && !this.achievements.includes('die_100_times')) {
+            this.achievements.push('die_100_times');
+            this.showAchievement('🔥 DIED 100 TIMES');
+        }
+        
+        // Playtime milestones
+        if (this.totalPlayTime >= 300 && !this.achievements.includes('play_5_minutes')) {
+            this.achievements.push('play_5_minutes');
+            this.showAchievement('⏰ PLAYED 5 MINUTES');
+        }
+    },
+    
+    showAchievement(message) {
+        const achievement = document.getElementById('achievement');
+        if (achievement) {
+            achievement.textContent = `ACHIEVEMENT UNLOCKED: ${message}`;
+            achievement.classList.remove('hidden');
+            
+            setTimeout(() => {
+                achievement.classList.add('hidden');
+            }, 3000);
+        }
+    }
+};
+
+// Initialize systems
+let soundSystem = new SoundSystem();
+let saveSystem = new SaveSystem();
+
+// Enhanced AdSense Integration for Maximum Revenue
+class AdSenseManager {
     constructor() {
-        this.ads = [];
-        this.adCount = 0;
+        this.adsenseId = 'ca-pub-YOUR_ADSENSE_ID'; // Replace with your ID
+        this.slotId = 'YOUR_SLOT_ID'; // Replace with your slot ID
+        this.revenueTracker = {
+            impressions: 0,
+            clicks: 0,
+            estimatedRevenue: 0
+        };
         this.init();
     }
     
     init() {
-        // Create ad slots
-        this.createAdSlots();
-        this.loadAdScript();
-    }
-    
-    loadAdScript() {
-        // Replace YOUR_ADSENSE_ID with your actual AdSense publisher ID
-        const script = document.createElement('script');
-        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID';
-        script.crossOrigin = 'anonymous';
-        script.async = true;
-        document.head.appendChild(script);
-    }
-    
-    createAdSlots() {
-        // Create ad slot in death screen
-        const deathScreen = document.getElementById('death-screen');
-        if (deathScreen) {
-            const adContainer = document.createElement('div');
-            adContainer.id = 'death-ad';
-            adContainer.innerHTML = `
-                <div class="bg-gray-900 p-4 rounded-lg max-w-sm text-center my-4">
-                    <p class="text-yellow-400 font-bold text-sm mb-2">🎮 SUPPORT THE DEVELOPER</p>
-                    <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></div>
-                    <p class="text-xs text-gray-400 mt-2">Ad helps keep the game free!</p>
-                </div>
-            `;
-            deathScreen.insertBefore(adContainer, deathScreen.lastElementChild);
-        }
-        
-        // Create banner ad
-        const gameContainer = document.getElementById('game-container');
-        if (gameContainer) {
-            const bannerAd = document.createElement('div');
-            bannerAd.id = 'banner-ad';
-            bannerAd.className = 'absolute top-16 left-0 right-0 z-10 flex justify-center';
-            bannerAd.innerHTML = `
-                <div class="bg-black bg-opacity-80 p-2 rounded">
-                    <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_BANNER_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></div>
-                </div>
-            `;
-            gameContainer.insertBefore(bannerAd, gameContainer.firstChild);
-        }
-    }
-    
-    // Show interstitial ad after certain deaths
-    maybeShowInterstitial() {
-        this.adCount++;
-        if (this.adCount % 5 === 0) { // Show every 5 deaths
-            this.showInterstitial();
-        }
-    }
-    
-    showInterstitial() {
-        // This would require a more complex implementation
-        // For now, we'll just use banner and inline ads
-        console.log('Ad would be shown here');
-    }
-    
-    // Track ad performance
-    trackAdImpression(adSlot) {
-        if (window.adsbygoogle) {
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-        }
-    }
-}
-
-// Performance monitoring
-class PerformanceMonitor {
-    constructor() {
-        this.frameCount = 0;
-        this.lastTime = performance.now();
-        this.fps = 60;
-        this.startMonitoring();
-    }
-    
-    startMonitoring() {
-        setInterval(() => {
-            const currentTime = performance.now();
-            const deltaTime = currentTime - this.lastTime;
-            this.fps = Math.round((this.frameCount / deltaTime) * 1000);
-            this.frameCount = 0;
-            this.lastTime = currentTime;
-            
-            // Adaptive quality based on FPS
-            if (this.fps < 30) {
-                this.reduceQuality();
+        // Initialize AdSense when page loads
+        if (typeof adsbygoogle !== 'undefined') {
+            try {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                console.log('AdSense initialized successfully');
+            } catch (e) {
+                console.log('AdSense initialization error:', e);
             }
-        }, 1000);
-    }
-    
-    reduceQuality() {
-        // Reduce particle count if FPS is low
-        if (particles.length > 20) {
-            particles = particles.slice(0, 20);
         }
         
-        // Reduce glow effects
-        ctx.shadowBlur = 0;
+        // Track ad impressions
+        this.trackImpressions();
+    }
+    
+    trackImpressions() {
+        // Track when ads are displayed
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1 && node.id === 'adsbygoogle') {
+                            this.revenueTracker.impressions++;
+                            console.log(`Ad impression #${this.revenueTracker.impressions}`);
+                        }
+                    });
+                }
+            });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+    
+    // Strategic ad placement for maximum revenue
+    showDeathScreenAd() {
+        // Show ads more frequently on death screens (highest engagement)
+        setTimeout(() => {
+            if (typeof adsbygoogle !== 'undefined') {
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackAdDisplay('death_screen');
+                } catch (e) {
+                    console.log('Death screen ad error:', e);
+                }
+            }
+        }, 1000); // Show after 1 second of death screen
+    }
+    
+    showVictoryScreenAd() {
+        // Show ads on victory (celebration moment)
+        setTimeout(() => {
+            if (typeof adsbygoogle !== 'undefined') {
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                    this.trackAdDisplay('victory_screen');
+                } catch (e) {
+                    console.log('Victory screen ad error:', e);
+                }
+            }
+        }, 2000); // Show after 2 seconds
+    }
+    
+    trackAdDisplay(screenType) {
+        this.revenueTracker.impressions++;
+        console.log(`📈 Ad displayed on ${screenType}. Total impressions: ${this.revenueTracker.impressions}`);
+        
+        // Update user message about supporting developer
+        this.updateSupportMessage();
+    }
+    
+    updateSupportMessage() {
+        const messages = [
+            "🎮 Support the developer - ads help keep games free!",
+            "💰 Buy me a coffee? Watch an ad! ☕",
+            "🌟 Developer is broke! Please disable ad blockers 😅",
+            "🚀 Love the game? Ad support helps create more! ❤️",
+            "🎯 Thanks for supporting indie game development!"
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        // Update ad section messages
+        const adMessages = document.querySelectorAll('.ad-support-message');
+        adMessages.forEach(element => {
+            element.textContent = randomMessage;
+        });
+    }
+    
+    // Calculate estimated revenue (for tracking purposes)
+    calculateEstimatedRevenue() {
+        // Rough estimates - adjust based on your actual data
+        const cpm = 2.0; // Cost per 1000 impressions (varies by region)
+        const ctr = 0.02; // Click-through rate (2%)
+        const cpc = 0.50; // Cost per click
+        
+        const impressionRevenue = (this.revenueTracker.impressions / 1000) * cpm;
+        const clickRevenue = this.revenueTracker.clicks * cpc;
+        
+        this.revenueTracker.estimatedRevenue = impressionRevenue + clickRevenue;
+        
+        console.log(`💰 Estimated revenue: $${this.revenueTracker.estimatedRevenue.toFixed(2)}`);
+        return this.revenueTracker.estimatedRevenue;
+    }
+    
+    // Show motivational message to users
+    showSupportMessage() {
+        const supportMessages = [
+            "🎮 Developer needs coffee to code more games! ☕",
+            "💸 Broke student alert! Please support with ads 😅",
+            "🌟 Love the game? Keep it free with ad support!",
+            "🚀 Every ad watched = more awesome games coming!",
+            "❤️ Support indie developers - watch an ad!"
+        ];
+        
+        const randomMessage = supportMessages[Math.floor(Math.random() * supportMessages.length)];
+        
+        // You can call this function to show random support messages
+        console.log(randomMessage);
+        
+        return randomMessage;
     }
 }
 
-// Global instances
-let soundEffects = new SoundEffects();
-let saveSystem = new SaveSystem();
-let adManager = new AdManager();
-let performanceMonitor = new PerformanceMonitor();
+// Initialize AdSense
+let adSenseManager = new AdSenseManager();
+
+// Export for use in main script
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SoundSystem, SaveSystem, stats, AdSenseManager };
+}
