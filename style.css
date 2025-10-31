@@ -24,17 +24,20 @@ body{
     touch-action:none;
 }
 
-/* Mobile Controls - Enhanced and Fixed */
+/* FIXED Mobile Controls - Always visible on ALL devices */
 #mobile-controls {
-    position: absolute !important;
+    position: fixed !important;
     bottom: 24px !important;
     left: 16px !important;
     right: 16px !important;
-    z-index: 999 !important;
+    z-index: 9999 !important;
     pointer-events: auto !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-end !important;
+    /* Ensure visible on all screen sizes */
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .mobile-btn {
@@ -59,6 +62,9 @@ body{
     touch-action: manipulation !important;
     font-size: 16px !important;
     line-height: 1 !important;
+    /* Ensure buttons work on desktop too */
+    position: relative !important;
+    z-index: 10000 !important;
 }
 
 .jump-btn {
@@ -186,16 +192,26 @@ body{
     100%{opacity:0.5}
 }
 
-/* Neon Effects */
+/* FIXED: Enhanced Neon Effects for better visibility */
 .neon-blood-box{
-    position:relative;
-    padding:10px 20px;
-    background:rgba(0,0,0,0.8);
-    border:2px solid #ff0000;
-    border-radius:10px;
-    box-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 30px #ff0000,inset 0 0 10px #ff0000;
-    animation:bloodDrip 3s infinite;
-    overflow:hidden;
+    position: relative !important;
+    padding: 15px 25px !important;
+    background: rgba(0,0,0,0.95) !important;
+    border: 3px solid #ff0000 !important;
+    border-radius: 15px !important;
+    box-shadow: 
+        0 0 20px #ff0000,
+        0 0 40px #ff0000,
+        0 0 60px #ff0000,
+        inset 0 0 20px #ff0000 !important;
+    animation: bloodDrip 3s infinite;
+    overflow: hidden;
+    margin-top: 20px !important;
+    display: inline-block !important;
+    /* Ensure it's always visible */
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 1000 !important;
 }
 
 .neon-blood-box::before{
@@ -231,22 +247,47 @@ body{
 }
 
 @keyframes bloodDrip{
-    0%{box-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 30px #ff0000,inset 0 0 10px #ff0000}
-    50%{box-shadow:0 0 15px #ff0000,0 0 25px #ff0000,0 0 35px #ff0000,inset 0 0 15px #ff0000}
-    100%{box-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 30px #ff0000,inset 0 0 10px #ff0000}
+    0%{box-shadow:0 0 20px #ff0000,0 0 40px #ff0000,0 0 60px #ff0000,inset 0 0 20px #ff0000}
+    50%{box-shadow:0 0 30px #ff0000,0 0 50px #ff0000,0 0 70px #ff0000,inset 0 0 30px #ff0000}
+    100%{box-shadow:0 0 20px #ff0000,0 0 40px #ff0000,0 0 60px #ff0000,inset 0 0 20px #ff0000}
 }
 
 .neon-text{
-    color:#fff;
-    text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #ff0000,0 0 20px #ff0000,0 0 25px #ff0000;
-    animation:neonGlow 1.5s ease-in-out infinite alternate;
-    font-weight:bold;
-    letter-spacing:1px;
+    color: #ffffff !important;
+    text-shadow: 
+        0 0 10px #ffffff,
+        0 0 20px #ffffff,
+        0 0 30px #ff0000,
+        0 0 40px #ff0000,
+        0 0 50px #ff0000 !important;
+    animation: neonGlow 1.5s ease-in-out infinite alternate;
+    font-weight: bold !important;
+    letter-spacing: 2px !important;
+    font-size: 14px !important;
+    display: block !important;
+    margin: 0 !important;
+    /* Ensure text is always visible */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 @keyframes neonGlow{
-    from{text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #ff0000,0 0 20px #ff0000,0 0 25px #ff0000}
-    to{text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #ff0000,0 0 40px #ff0000,0 0 50px #ff0000}
+    from {
+        text-shadow: 
+            0 0 10px #ffffff,
+            0 0 20px #ffffff,
+            0 0 30px #ff0000,
+            0 0 40px #ff0000,
+            0 0 50px #ff0000
+    }
+    to {
+        text-shadow: 
+            0 0 20px #ffffff,
+            0 0 40px #ffffff,
+            0 0 60px #ff0000,
+            0 0 80px #ff0000,
+            0 0 100px #ff0000
+    }
 }
 
 /* Achievement Animation */
@@ -394,4 +435,26 @@ transform:translateZ(0);
         width: 24px !important;
         height: 24px !important;
     }
+}
+
+/* CRITICAL: Ensure mobile controls are NEVER hidden */
+@media (min-width: 641px) {
+    /* Desktop: Show mobile controls too for mouse/touch */
+    #mobile-controls {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Force visibility of all interactive elements */
+#mobile-controls,
+.mobile-btn,
+#left-btn,
+#right-btn,
+#jump-btn {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: flex !important;
+    pointer-events: auto !important;
 }
