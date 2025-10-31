@@ -39,31 +39,26 @@
                 <span id="deaths-counter" class="text-sm sm:text-xl font-bold">Deaths: 0</span>
                 <span id="time-counter" class="text-sm sm:text-xl font-bold">Time: 0:00</span>
                 <span id="level-indicator" class="text-xs sm:text-sm text-yellow-400 hidden sm:block">Level: 1</span>
-                <!-- Debug Info -->
-                <span id="debug-info" class="text-xs text-blue-400 font-mono hidden">JUMP: 18 | SPD: 8</span>
             </div>
             <button id="pause-btn" class="px-2 py-1 sm:px-4 sm:py-2 bg-red-900 rounded-lg hover:bg-red-700 transition-colors touch-manipulation">
                 <i data-feather="pause" class="w-4 h-4 sm:w-6 sm:h-6"></i>
             </button>
         </div>
 
-        <!-- Enhanced Mobile Controls -->
-        <div id="mobile-controls" class="absolute bottom-6 left-4 right-4 flex justify-between items-end z-20">
+        <!-- FIXED Mobile Controls - Always visible on all devices -->
+        <div id="mobile-controls" class="fixed bottom-6 left-4 right-4 flex justify-between items-end z-20">
             <!-- Left movement controls -->
             <div class="flex space-x-4">
-                <button id="left-btn" class="mobile-btn left-btn" 
-                        style="touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                <button id="left-btn" class="mobile-btn left-btn">
                     <i data-feather="chevron-left" class="w-8 h-8 sm:w-10 sm:h-10 text-white"></i>
                 </button>
-                <button id="right-btn" class="mobile-btn right-btn" 
-                        style="touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                <button id="right-btn" class="mobile-btn right-btn">
                     <i data-feather="chevron-right" class="w-8 h-8 sm:w-10 sm:h-10 text-white"></i>
                 </button>
             </div>
             
             <!-- Jump button -->
-            <button id="jump-btn" class="mobile-btn jump-btn" 
-                    style="touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+            <button id="jump-btn" class="mobile-btn jump-btn">
                 <i data-feather="arrow-up" class="w-10 h-10 sm:w-12 sm:h-12 text-white"></i>
             </button>
         </div>
@@ -102,8 +97,11 @@
                 </div>
             </div>
 
-            <div class="neon-blood-box">
-                <p class="neon-text text-xs sm:text-sm">Made by zeroday</p>
+            <!-- FIXED: Made by zeroday text - more visible positioning -->
+            <div class="mt-8">
+                <div class="neon-blood-box">
+                    <p class="neon-text text-xs sm:text-sm">Made by zeroday</p>
+                </div>
             </div>
         </div>
 
@@ -243,7 +241,6 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Show install button or banner
             console.log('PWA install prompt available');
         });
         
