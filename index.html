@@ -31,7 +31,7 @@
 <body class="bg-black text-red-500 font-mono overflow-hidden select-none">
     <div id="game-container" class="relative w-full h-screen">
         <!-- Game Canvas -->
-        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full touch-none"></canvas>
+        <canvas id="gameCanvas" class="absolute inset-0 w-full h-full touch-manipulation"></canvas>
         
         <!-- Game UI -->
         <div class="absolute top-0 left-0 right-0 p-2 sm:p-4 flex justify-between items-center z-20">
@@ -45,21 +45,21 @@
             </button>
         </div>
 
-        <!-- Mobile Controls -->
-        <div id="mobile-controls" class="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 sm:hidden">
+        <!-- Enhanced Mobile Controls -->
+        <div id="mobile-controls" class="absolute bottom-6 left-4 right-4 flex justify-between items-end z-20 lg:hidden">
             <!-- Left movement controls -->
-            <div class="flex space-x-2">
-                <button id="left-btn" class="w-16 h-16 bg-red-800 bg-opacity-80 rounded-full border-2 border-red-600 flex items-center justify-center touch-manipulation active:bg-red-600">
-                    <i data-feather="chevron-left" class="w-8 h-8 text-white"></i>
+            <div class="flex space-x-4">
+                <button id="left-btn" class="w-18 h-18 sm:w-20 sm:h-20 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90">
+                    <i data-feather="chevron-left" class="w-10 h-10 sm:w-12 sm:h-12 text-white drop-shadow-md"></i>
                 </button>
-                <button id="right-btn" class="w-16 h-16 bg-red-800 bg-opacity-80 rounded-full border-2 border-red-600 flex items-center justify-center touch-manipulation active:bg-red-600">
-                    <i data-feather="chevron-right" class="w-8 h-8 text-white"></i>
+                <button id="right-btn" class="w-18 h-18 sm:w-20 sm:h-20 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90">
+                    <i data-feather="chevron-right" class="w-10 h-10 sm:w-12 sm:h-12 text-white drop-shadow-md"></i>
                 </button>
             </div>
             
             <!-- Jump button -->
-            <button id="jump-btn" class="w-20 h-20 bg-yellow-600 bg-opacity-80 rounded-full border-2 border-yellow-400 flex items-center justify-center touch-manipulation active:bg-yellow-500">
-                <i data-feather="arrow-up" class="w-10 h-10 text-white"></i>
+            <button id="jump-btn" class="w-22 h-22 sm:w-26 sm:h-26 bg-orange-500 bg-opacity-95 rounded-full border-3 border-orange-400 flex items-center justify-center touch-manipulation active:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-xl transform transition-all duration-150 active:scale-90">
+                <i data-feather="arrow-up" class="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-md"></i>
             </button>
         </div>
 
@@ -99,18 +99,24 @@
             </div>
             
             <button id="retry-btn" class="px-6 py-3 sm:px-8 sm:py-4 bg-red-800 text-lg sm:text-xl rounded-lg hover:bg-red-600 active:bg-red-700 transition-all duration-200 mb-4 touch-manipulation">
-                TRY AGAIN (MORTAL)
+                ⚡ INSTANT RETRY
             </button>
             
             <button id="save-btn" class="px-4 py-2 bg-green-800 text-sm rounded-lg hover:bg-green-600 mb-4 touch-manipulation">
                 💾 SAVE CHECKPOINT
             </button>
 
-            <!-- AdSense Ad -->
-            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center mb-4">
-                <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2">🎮 SUPPORT THE DEVELOPER</p>
-                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></div>
-                <p class="text-xs text-gray-400 mt-2">Devloper is Broke Ad helps keep the game free!</p>
+            <!-- Enhanced AdSense Ad -->
+            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center mb-4 border border-yellow-500">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2 ad-support-message">🎮 DEVELOPER IS BROKE! 😭</p>
+                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <p class="text-xs text-yellow-300 mt-2 ad-support-message">Student developer needs coffee to survive! ☕</p>
+                <p class="text-xs text-green-400 mt-1">💰 Ads help keep games free FOREVER!</p>
+                <p class="text-xs text-red-400 mt-1">⚠️ Please disable ad blockers!</p>
+                <div class="mt-2 flex justify-center space-x-2 text-xs">
+                    <span class="bg-red-600 text-white px-2 py-1 rounded">IMPOVERISHED</span>
+                    <span class="bg-yellow-600 text-white px-2 py-1 rounded">NEEDS ADS</span>
+                </div>
             </div>
 
             <div class="p-3 sm:p-4 bg-red-900 bg-opacity-60 rounded-lg max-w-sm text-center">
@@ -158,11 +164,16 @@
                 MAIN MENU
             </button>
 
-            <!-- AdSense Ad -->
-            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center">
-                <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2">🎮 CONGRATULATIONS!</p>
-                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto" data-full-width-responsive="true"></div>
-                <p class="text-xs text-gray-400 mt-2">You did it! 🎉</p>
+            <!-- Enhanced Victory AdSense Ad -->
+            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center border border-green-500">
+                <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2 ad-support-message">🏆 VICTORY CELEBRATION!</p>
+                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <p class="text-xs text-green-300 mt-2 ad-support-message">You conquered Hell! 🎉 Now support the broken developer! 😭</p>
+                <p class="text-xs text-blue-400 mt-1">📢 Share your victory with friends!</p>
+                <div class="mt-2 flex justify-center space-x-2 text-xs">
+                    <span class="bg-green-600 text-white px-2 py-1 rounded">VICTORIOUS</span>
+                    <span class="bg-blue-600 text-white px-2 py-1 rounded">SHARE IT</span>
+                </div>
             </div>
         </div>
 
@@ -219,15 +230,15 @@
             console.log('PWA install prompt available');
         });
         
-        // Google AdSense Script (Replace YOUR_ADSENSE_ID with your actual ID)
+        // Google AdSense Script (Replace XXXXXXXXXX with your actual AdSense ID)
         window.adsbygoogle = window.adsbygoogle || [];
         (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-YOUR_ADSENSE_ID", // Replace with your AdSense ID
+            google_ad_client: "ca-pub-XXXXXXXXXX", // Replace with your AdSense ID
             enable_page_level_ads: true
         });
     </script>
     
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"></script>
 </body>
 </html>
