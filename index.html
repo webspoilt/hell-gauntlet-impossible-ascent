@@ -47,24 +47,24 @@
             </button>
         </div>
 
-        <!-- Enhanced Mobile Controls - Always visible for testing -->
-        <div id="mobile-controls" class="absolute bottom-6 left-4 right-4 flex justify-between items-end z-20" style="display: flex !important;">
+        <!-- Enhanced Mobile Controls -->
+        <div id="mobile-controls" class="absolute bottom-6 left-4 right-4 flex justify-between items-end z-20">
             <!-- Left movement controls -->
             <div class="flex space-x-4">
-                <button id="left-btn" class="w-20 h-20 sm:w-24 sm:h-24 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90" 
-                        style="touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
-                    <i data-feather="chevron-left" class="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-md"></i>
+                <button id="left-btn" class="mobile-btn left-btn" 
+                        style="touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                    <i data-feather="chevron-left" class="w-8 h-8 sm:w-10 sm:h-10 text-white"></i>
                 </button>
-                <button id="right-btn" class="w-20 h-20 sm:w-24 sm:h-24 bg-red-700 bg-opacity-95 rounded-full border-3 border-red-500 flex items-center justify-center touch-manipulation active:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 shadow-lg transform transition-all duration-150 active:scale-90"
-                        style="touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
-                    <i data-feather="chevron-right" class="w-12 h-12 sm:w-14 sm:h-14 text-white drop-shadow-md"></i>
+                <button id="right-btn" class="mobile-btn right-btn" 
+                        style="touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                    <i data-feather="chevron-right" class="w-8 h-8 sm:w-10 sm:h-10 text-white"></i>
                 </button>
             </div>
             
             <!-- Jump button -->
-            <button id="jump-btn" class="w-24 h-24 sm:w-28 sm:h-28 bg-orange-500 bg-opacity-95 rounded-full border-3 border-orange-400 flex items-center justify-center touch-manipulation active:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-300 shadow-xl transform transition-all duration-150 active:scale-90"
-                    style="touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
-                <i data-feather="arrow-up" class="w-14 h-14 sm:w-16 sm:h-16 text-white drop-shadow-md"></i>
+            <button id="jump-btn" class="mobile-btn jump-btn" 
+                    style="touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;">
+                <i data-feather="arrow-up" class="w-10 h-10 sm:w-12 sm:h-12 text-white"></i>
             </button>
         </div>
 
@@ -90,6 +90,18 @@
                 <p class="text-xs sm:text-sm mt-2">One mistake = instant death. Good luck!</p>
             </div>
 
+            <!-- Home Page AdSense Ad -->
+            <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center mb-4 border border-blue-500">
+                <p class="text-blue-400 font-bold text-sm sm:text-base mb-2 ad-support-message">🎮 WELCOME TO HELL'S GAUNTLET!</p>
+                <div id="adsbygoogle-home" style="display:block;" data-ad-client="ca-pub-1394235508992153" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <p class="text-xs text-blue-300 mt-2 ad-support-message">Support indie gaming with every ad view! ❤️</p>
+                <p class="text-xs text-green-400 mt-1">💰 Keeps this game free forever!</p>
+                <div class="mt-2 flex justify-center space-x-2 text-xs">
+                    <span class="bg-blue-600 text-white px-2 py-1 rounded">INDIE DEV</span>
+                    <span class="bg-green-600 text-white px-2 py-1 rounded">FREE GAME</span>
+                </div>
+            </div>
+
             <div class="neon-blood-box">
                 <p class="neon-text text-xs sm:text-sm">Made by zeroday</p>
             </div>
@@ -111,11 +123,10 @@
                 💾 SAVE CHECKPOINT
             </button>
 
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1394235508992153"
-     crossorigin="anonymous"></script>
+            <!-- Enhanced AdSense Ad -->
             <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center mb-4 border border-yellow-500">
                 <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2 ad-support-message">🎮 DEVELOPER IS BROKE! 😭</p>
-                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-1394235508992153" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
                 <p class="text-xs text-yellow-300 mt-2 ad-support-message">Student developer needs coffee to survive! ☕</p>
                 <p class="text-xs text-green-400 mt-1">💰 Ads help keep games free FOREVER!</p>
                 <p class="text-xs text-red-400 mt-1">⚠️ Please disable ad blockers!</p>
@@ -173,7 +184,7 @@
             <!-- Enhanced Victory AdSense Ad -->
             <div class="p-3 sm:p-4 bg-gray-900 rounded-lg max-w-sm text-center border border-green-500">
                 <p class="text-yellow-400 font-bold text-sm sm:text-base mb-2 ad-support-message">🏆 VICTORY CELEBRATION!</p>
-                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
+                <div id="adsbygoogle" style="display:block;" data-ad-client="ca-pub-1394235508992153" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></div>
                 <p class="text-xs text-green-300 mt-2 ad-support-message">You conquered Hell! 🎉 Now support the broken developer! 😭</p>
                 <p class="text-xs text-blue-400 mt-1">📢 Share your victory with friends!</p>
                 <div class="mt-2 flex justify-center space-x-2 text-xs">
@@ -239,12 +250,13 @@
         // Google AdSense Script (Replace XXXXXXXXXX with your actual AdSense ID)
         window.adsbygoogle = window.adsbygoogle || [];
         (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-XXXXXXXXXX", // Replace with your AdSense ID
+            google_ad_client: "ca-pub-1394235508992153",
             enable_page_level_ads: true
         });
     </script>
     
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1394235508992153"
+     crossorigin="anonymous"></script>
 </body>
 </html>
