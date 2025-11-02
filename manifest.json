@@ -1,1 +1,45 @@
-{"name": "Hell's Gauntlet: Impossible Ascent", "short_name": "Hell's Gauntlet", "description": "The most brutal platformer ever created. Prepare to suffer.", "start_url": "/", "display": "fullscreen", "background_color": "#000000", "theme_color": "#000000", "orientation": "any", "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>", "sizes": "any", "type": "image/svg+xml"}], "categories": ["games", "entertainment"], "lang": "en"}
+{
+  "name": "Hell's Gauntlet: Impossible Ascent",
+  "short_name": "Hells Gauntlet",
+  "description": "The most brutal platformer ever created. Reach the green goal if you dare!",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "categories": ["games", "entertainment"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><rect width='800' height='600' fill='%23000'/><text x='400' y='300' text-anchor='middle' fill='%23ff0000' font-size='48'>Hell's Gauntlet</text></svg>",
+      "sizes": "800x600",
+      "type": "image/svg+xml",
+      "platform": "wide"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Start Game",
+      "short_name": "Play",
+      "description": "Start playing immediately",
+      "url": "/?action=play",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23000'/><polygon points='35,25 35,75 75,50' fill='%23fff'/></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
