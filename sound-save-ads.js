@@ -259,8 +259,8 @@ let saveSystem = new SaveSystem();
 // Enhanced AdSense Integration for Maximum Revenue
 class AdSenseManager {
     constructor() {
-        this.adsenseId = 'ca-pub-1394235508992153';
-        this.slotId = 'XXXXXXXXXX'; // Replace with your actual slot ID from AdSense dashboard
+        this.adsenseId = 'ca-pub-YOUR_ADSENSE_ID'; // Replace with your ID
+        this.slotId = 'YOUR_SLOT_ID'; // Replace with your slot ID
         this.revenueTracker = {
             impressions: 0,
             clicks: 0,
@@ -331,25 +331,6 @@ class AdSenseManager {
         }, 2000); // Show after 2 seconds
     }
     
-    showHomePageAd() {
-        // Show ads on home page (welcome moment)
-        setTimeout(() => {
-            if (typeof adsbygoogle !== 'undefined') {
-                try {
-                    // Push ads for home page ad container
-                    const homeAdContainer = document.getElementById('adsbygoogle-home');
-                    if (homeAdContainer) {
-                        (adsbygoogle = window.adsbygoogle || []).push({});
-                        this.trackAdDisplay('home_page');
-                        console.log('Home page ad displayed');
-                    }
-                } catch (e) {
-                    console.log('Home page ad error:', e);
-                }
-            }
-        }, 1500); // Show after 1.5 seconds on home page
-    }
-    
     trackAdDisplay(screenType) {
         this.revenueTracker.impressions++;
         console.log(`📈 Ad displayed on ${screenType}. Total impressions: ${this.revenueTracker.impressions}`);
@@ -413,13 +394,6 @@ class AdSenseManager {
 
 // Initialize AdSense
 let adSenseManager = new AdSenseManager();
-
-// Show home page ad when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        adSenseManager.showHomePageAd();
-    }, 2000); // Show home page ad after 2 seconds
-});
 
 // Export for use in main script
 if (typeof module !== 'undefined' && module.exports) {
