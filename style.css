@@ -2,459 +2,305 @@
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-body{
-    font-family:'Press Start 2P',cursive;
-    margin:0;padding:0;
-    overflow:hidden;
-    user-select:none;
-    -webkit-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    touch-action:none;
-    background:#000;
-    position:fixed;
-    width:100%;
-    height:100%;
-}
+body{font-family:'Press Start 2P',cursive;margin:0;padding:0;overflow:hidden;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;touch-action:none;background:#000;position:fixed;width:100%;height:100%}
 
-#gameCanvas{
-    background-color:#111;
-    display:block;
-    cursor:crosshair;
-    touch-action:none;
-}
+#gameCanvas{background-color:#111;display:block;cursor:crosshair;touch-action:none}
 
-/* FIXED Mobile Controls - Always visible on ALL devices */
+/* Mobile Controls - Responsive Design */
 #mobile-controls {
-    position: fixed !important;
+    position: absolute !important;
     bottom: 24px !important;
     left: 16px !important;
     right: 16px !important;
-    z-index: 9999 !important;
-    pointer-events: auto !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: flex-end !important;
-    /* Ensure visible on all screen sizes */
-    visibility: visible !important;
-    opacity: 1 !important;
+    z-index: 999 !important;
+    pointer-events: none !important;
 }
 
-.mobile-btn {
-    width: 70px !important;
-    height: 70px !important;
-    min-width: 60px !important;
-    min-height: 60px !important;
-    background: rgba(185, 28, 28, 0.95) !important;
-    border: 3px solid rgba(239, 68, 68, 0.9) !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition: all 0.15s ease !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+/* Hide mobile controls on desktop (1024px+) */
+@media (min-width: 1024px) {
+    #mobile-controls {
+        display: none !important;
+    }
+}
+
+/* Show mobile controls on mobile and tablet */
+@media (max-width: 1023px) {
+    #mobile-controls {
+        display: flex !important;
+    }
+}
+
+#mobile-controls button {
     pointer-events: auto !important;
     -webkit-tap-highlight-color: transparent !important;
     -webkit-touch-callout: none !important;
     -webkit-user-select: none !important;
     user-select: none !important;
     touch-action: manipulation !important;
+    min-width: 80px !important;
+    min-height: 80px !important;
     font-size: 16px !important;
     line-height: 1 !important;
-    /* Ensure buttons work on desktop too */
-    position: relative !important;
-    z-index: 10000 !important;
+    border: 3px solid !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
 }
 
-.jump-btn {
-    width: 85px !important;
-    height: 85px !important;
-    min-width: 75px !important;
-    min-height: 75px !important;
-    background: rgba(249, 115, 22, 0.95) !important;
-    border: 3px solid rgba(251, 146, 60, 0.9) !important;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(255,140,0,0.3) !important;
+#jump-btn {
+    min-width: 96px !important;
+    min-height: 96px !important;
 }
 
 /* Mobile controls button states */
-.mobile-btn:active,
-.mobile-btn.active {
-    transform: scale(0.88) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(255,0,0,0.4) !important;
+#mobile-controls button:active,
+#mobile-controls button.active {
+    transform: scale(0.85) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5) !important;
 }
 
-.left-btn:active,
-.left-btn.active,
-.right-btn:active,
-.right-btn.active {
+/* Left Side Ad Styling */
+.left-side-ad {
+    position: absolute !important;
+    top: 50% !important;
+    left: 16px !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    background: rgba(0,0,0,0.8) !important;
+    border: 1px solid #333 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+}
+
+/* Mobile Ad Responsiveness */
+@media (max-width: 768px) {
+    .left-side-ad {
+        display: none !important; /* Hide on mobile for better UX */
+    }
+}
+
+@media (min-width: 769px) {
+    .left-side-ad {
+        display: block !important; /* Show on desktop/tablet */
+    }
+}
+
+/* Left/Right buttons */
+#left-btn, #right-btn {
+    background: rgba(185, 28, 28, 0.95) !important;
+    border-color: rgba(239, 68, 68, 0.9) !important;
+}
+
+/* Right Side AMP Ad Styling */
+.right-side-amp-ad {
+    position: absolute !important;
+    top: 50% !important;
+    right: 16px !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    max-width: 100vw !important;
+}
+
+/* Mobile Ad Responsiveness - Hide right ad on mobile */
+@media (max-width: 768px) {
+    .left-side-ad {
+        display: none !important; /* Hide on mobile for better UX */
+    }
+    
+    .right-side-amp-ad {
+        display: none !important; /* Hide AMP ad on mobile too */
+    }
+}
+
+#left-btn:active, #right-btn:active,
+#left-btn.active, #right-btn.active {
     background: rgba(220, 38, 38, 1) !important;
     border-color: rgb(255, 68, 68) !important;
     box-shadow: 0 0 20px rgba(220, 38, 38, 0.6) !important;
 }
 
-.jump-btn:active,
-.jump-btn.active {
+/* Jump button */
+#jump-btn {
+    background: rgba(249, 115, 22, 0.95) !important;
+    border-color: rgba(251, 146, 60, 0.9) !important;
+}
+
+#jump-btn:active, #jump-btn.active {
     background: rgba(234, 88, 12, 1) !important;
     border-color: rgb(251, 146, 60) !important;
     box-shadow: 0 0 20px rgba(234, 88, 12, 0.6) !important;
 }
 
-/* Responsive sizing for mobile controls */
+/* Responsive sizing */
 @media (max-width: 640px) {
-    .mobile-btn {
-        width: 60px !important;
-        height: 60px !important;
-        min-width: 55px !important;
-        min-height: 55px !important;
+    #mobile-controls button {
+        min-width: 72px !important;
+        min-height: 72px !important;
     }
     
-    .jump-btn {
-        width: 75px !important;
-        height: 75px !important;
-        min-width: 70px !important;
-        min-height: 70px !important;
+    #jump-btn {
+        min-width: 88px !important;
+        min-height: 88px !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    #mobile-controls button {
+        min-width: 80px !important;
+        min-height: 80px !important;
     }
     
+    #jump-btn {
+        min-width: 96px !important;
+        min-height: 96px !important;
+    }
+}
+
+/* Additional responsive rules for optimal mobile experience */
+@media (max-width: 640px) {
     #mobile-controls {
-        bottom: 16px !important;
+        bottom: 16px !important; /* Slightly closer to bottom on small screens */
         left: 12px !important;
         right: 12px !important;
     }
 }
 
-@media (max-width: 480px) {
-    .mobile-btn {
-        width: 55px !important;
-        height: 55px !important;
-        min-width: 50px !important;
-        min-height: 50px !important;
-    }
-    
-    .jump-btn {
-        width: 70px !important;
-        height: 70px !important;
-        min-width: 65px !important;
-        min-height: 65px !important;
-    }
-}
-
 /* Ensure canvas takes full screen */
 #game-container{
-    position:fixed;
-    top:0;left:0;
-    width:100vw;
-    height:100vh;
-    overflow:hidden;
+    position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;
 }
 
-/* Visual Effects */
-.blood-splatter{
-    position:absolute;
-    background-image:radial-gradient(circle,rgba(255,0,0,0.8) 0%,rgba(139,0,0,0.6) 70%,transparent 100%);
-    border-radius:50%;
-    pointer-events:none;
-    z-index:5;
-    animation:splatter 0.5s ease-out forwards;
+/* Enhanced mobile button styles */
+#mobile-controls button{
+    background:rgba(139,0,0,0.95) !important;
+    border:3px solid rgba(255,69,69,0.9) !important;
+    box-shadow:0 6px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(255,0,0,0.2);
+    transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter:blur(8px);
 }
 
-@keyframes splatter{
-    0%{transform:scale(0);opacity:1}
-    50%{transform:scale(1.5);opacity:0.8}
-    100%{transform:scale(1);opacity:0.3}
+#jump-btn{
+    background:rgba(255,140,0,0.95) !important;
+    border:3px solid rgba(255,160,0,0.9) !important;
+    box-shadow:0 6px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(255,140,0,0.3);
 }
 
-.shake{
-    animation:shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+/* Enhanced active state for mobile buttons */
+#mobile-controls button:active{
+    transform:scale(0.88);
+    background:rgba(220,38,38,1) !important;
+    box-shadow:0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(255,0,0,0.4);
 }
 
-@keyframes shake{
-    10%,90%{transform:translate3d(-1px,0,0)}
-    20%,80%{transform:translate3d(2px,0,0)}
-    30%,50%,70%{transform:translate3d(-4px,0,0)}
-    40%,60%{transform:translate3d(4px,0,0)}
+#jump-btn:active{
+    background:rgba(249,115,22,1) !important;
+    box-shadow:0 2px 8px rgba(0,0,0,0.6), 0 1px 2px rgba(255,140,0,0.4);
 }
 
-.difficulty-warning{
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background-color:rgba(255,0,0,0.3);
-    padding:10px;
-    border-radius:5px;
-    font-size:12px;
-    animation:pulse 2s infinite;
+/* Touch feedback */
+#mobile-controls button:focus{
+    outline:2px solid rgba(255,255,255,0.8);
+    outline-offset:2px;
 }
 
-@keyframes pulse{
-    0%{opacity:0.5}
-    50%{opacity:1}
-    100%{opacity:0.5}
+.blood-splatter{position:absolute;background-image:radial-gradient(circle,rgba(255,0,0,0.8) 0%,rgba(139,0,0,0.6) 70%,transparent 100%);border-radius:50%;pointer-events:none;z-index:5;animation:splatter 0.5s ease-out forwards}
+
+@keyframes splatter{0%{transform:scale(0);opacity:1}50%{transform:scale(1.5);opacity:0.8}100%{transform:scale(1);opacity:0.3}}
+
+.shake{animation:shake 0.5s cubic-bezier(.36,.07,.19,.97) both}
+
+@keyframes shake{10%,90%{transform:translate3d(-1px,0,0)}20%,80%{transform:translate3d(2px,0,0)}30%,50%,70%{transform:translate3d(-4px,0,0)}40%,60%{transform:translate3d(4px,0,0)}}
+
+.difficulty-warning{position:fixed;bottom:20px;right:20px;background-color:rgba(255,0,0,0.3);padding:10px;border-radius:5px;font-size:12px;animation:pulse 2s infinite}
+
+@keyframes pulse{0%{opacity:0.5}50%{opacity:1}100%{opacity:0.5}}
+
+.neon-blood-box{position:relative;padding:10px 20px;background:rgba(0,0,0,0.8);border:2px solid #ff0000;border-radius:10px;box-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 30px #ff0000,inset 0 0 10px #ff0000;animation:bloodDrip 3s infinite;overflow:hidden}
+
+.neon-blood-box::before{content:"";position:absolute;top:-10px;left:10%;width:15px;height:15px;background:#ff0000;border-radius:50%;box-shadow:0 0 15px 5px #ff0000,0 0 25px 10px rgba(255,0,0,0.5);animation:drip 3s infinite}
+
+.neon-blood-box::after{content:"";position:absolute;top:-5px;right:15%;width:12px;height:12px;background:#ff0000;border-radius:50%;box-shadow:0 0 15px 5px #ff0000,0 0 25px 10px rgba(255,0,0,0.5);animation:drip 4s infinite 1s}
+
+@keyframes drip{0%{transform:translateY(0);opacity:1}50%{transform:translateY(10px);opacity:0.8}100%{transform:translateY(100px);opacity:0}}
+
+@keyframes bloodDrip{0%{box-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 30px #ff0000,inset 0 0 10px #ff0000}50%{box-shadow:0 0 15px #ff0000,0 0 25px #ff0000,0 0 35px #ff0000,inset 0 0 15px #ff0000}100%{box-shadow:0 0 10px #ff0000,0 0 20px #ff0000,0 0 30px #ff0000,inset 0 0 10px #ff0000}}
+
+.neon-text{color:#fff;text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #ff0000,0 0 20px #ff0000,0 0 25px #ff0000;animation:neonGlow 1.5s ease-in-out infinite alternate;font-weight:bold;letter-spacing:1px}
+
+@keyframes neonGlow{from{text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #ff0000,0 0 20px #ff0000,0 0 25px #ff0000}to{text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #ff0000,0 0 40px #ff0000,0 0 50px #ff0000}}
+
+#mobile-controls{pointer-events:none}
+
+#mobile-controls button{pointer-events:auto;-webkit-tap-highlight-color:transparent;transition:all 0.2s ease}
+
+#mobile-controls button:active{transform:scale(0.95)}
+
+#left-btn.active,#right-btn.active{
+    background-color:#dc2626 !important;
+    transform:scale(0.85);
+    box-shadow:0 0 24px rgba(220,38,38,0.8), 0 0 12px rgba(255,0,0,0.6);
+    border-color:#ff4444 !important;
 }
 
-/* FIXED: Enhanced Neon Effects for better visibility */
-.neon-blood-box{
-    position: relative !important;
-    padding: 15px 25px !important;
-    background: rgba(0,0,0,0.95) !important;
-    border: 3px solid #ff0000 !important;
-    border-radius: 15px !important;
-    box-shadow: 
-        0 0 20px #ff0000,
-        0 0 40px #ff0000,
-        0 0 60px #ff0000,
-        inset 0 0 20px #ff0000 !important;
-    animation: bloodDrip 3s infinite;
-    overflow: hidden;
-    margin-top: 20px !important;
-    display: inline-block !important;
-    /* Ensure it's always visible */
-    opacity: 1 !important;
-    visibility: visible !important;
-    z-index: 1000 !important;
+#jump-btn:active, #jump-btn.active{
+    background-color:#ea580c !important;
+    transform:scale(0.85);
+    box-shadow:0 0 24px rgba(234,88,12,0.8), 0 0 12px rgba(255,140,0,0.6);
+    border-color:#ff8800 !important;
 }
 
-.neon-blood-box::before{
-    content:"";
-    position:absolute;
-    top:-10px;
-    left:10%;
-    width:15px;
-    height:15px;
-    background:#ff0000;
-    border-radius:50%;
-    box-shadow:0 0 15px 5px #ff0000,0 0 25px 10px rgba(255,0,0,0.5);
-    animation:drip 3s infinite;
-}
+button{transition:all 0.3s ease;cursor:pointer}
 
-.neon-blood-box::after{
-    content:"";
-    position:absolute;
-    top:-5px;
-    right:15%;
-    width:12px;
-    height:12px;
-    background:#ff0000;
-    border-radius:50%;
-    box-shadow:0 0 15px 5px #ff0000,0 0 25px 10px rgba(255,0,0,0.5);
-    animation:drip 4s infinite 1s;
-}
+button:active{transform:translateY(1px)}
 
-@keyframes drip{
-    0%{transform:translateY(0);opacity:1}
-    50%{transform:translateY(10px);opacity:0.8}
-    100%{transform:translateY(100px);opacity:0}
-}
+@media (max-width:640px){#deaths-counter,#time-counter{font-size:0.75rem}}
 
-@keyframes bloodDrip{
-    0%{box-shadow:0 0 20px #ff0000,0 0 40px #ff0000,0 0 60px #ff0000,inset 0 0 20px #ff0000}
-    50%{box-shadow:0 0 30px #ff0000,0 0 50px #ff0000,0 0 70px #ff0000,inset 0 0 30px #ff0000}
-    100%{box-shadow:0 0 20px #ff0000,0 0 40px #ff0000,0 0 60px #ff0000,inset 0 0 20px #ff0000}
-}
+*{-webkit-transform:translateZ(0);transform:translateZ(0)}
 
-.neon-text{
-    color: #ffffff !important;
-    text-shadow: 
-        0 0 10px #ffffff,
-        0 0 20px #ffffff,
-        0 0 30px #ff0000,
-        0 0 40px #ff0000,
-        0 0 50px #ff0000 !important;
-    animation: neonGlow 1.5s ease-in-out infinite alternate;
-    font-weight: bold !important;
-    letter-spacing: 2px !important;
-    font-size: 14px !important;
-    display: block !important;
-    margin: 0 !important;
-    /* Ensure text is always visible */
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-@keyframes neonGlow{
-    from {
-        text-shadow: 
-            0 0 10px #ffffff,
-            0 0 20px #ffffff,
-            0 0 30px #ff0000,
-            0 0 40px #ff0000,
-            0 0 50px #ff0000
+/* Additional mobile-specific adjustments */
+@media (max-width: 768px) {
+    #mobile-controls button {
+        min-width: 80px !important;
+        min-height: 80px !important;
     }
-    to {
-        text-shadow: 
-            0 0 20px #ffffff,
-            0 0 40px #ffffff,
-            0 0 60px #ff0000,
-            0 0 80px #ff0000,
-            0 0 100px #ff0000
+    
+    #jump-btn {
+        min-width: 88px !important;
+        min-height: 88px !important;
     }
 }
 
-/* Achievement Animation */
-#achievement{
-    animation:achievementSlide 3s ease-in-out forwards;
-}
+*{transition:transform 0.1s ease}
 
-@keyframes achievementSlide{
-    0%{transform:translate(-50%,-50%) scale(0);opacity:0}
-    15%,85%{transform:translate(-50%,-50%) scale(1);opacity:1}
-    100%{transform:translate(-50%,-50%) scale(0);opacity:0}
-}
+#achievement{animation:achievementSlide 3s ease-in-out forwards}
 
-/* Loading Dots */
-.loading-dots::after{
-    content:'';
-    animation:loading 1.5s infinite;
-}
+@keyframes achievementSlide{0%{transform:translate(-50%,-50%) scale(0);opacity:0}15%,85%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) scale(0);opacity:0}}
 
-@keyframes loading{
-    0%,20%{content:''}
-    40%{content:'.'}
-    60%{content:'..'}
-    80%,100%{content:'...'}
-}
+.loading-dots::after{content:'';animation:loading 1.5s infinite}
 
-/* Particle Effects */
-.particle{
-    position:absolute;
-    background:#ff0000;
-    pointer-events:none;
-    border-radius:50%;
-    animation:particleFall 2s linear forwards;
-}
+@keyframes loading{0%,20%{content:''}40%{content:'.'}60%{content:'..'}80%,100%{content:'...'}}
 
-@keyframes particleFall{
-    0%{transform:translateY(0) rotate(0deg);opacity:1}
-    100%{transform:translateY(100vh) rotate(360deg);opacity:0}
-}
+.particle{position:absolute;background:#ff0000;pointer-events:none;border-radius:50%;animation:particleFall 2s linear forwards}
 
-.flash{
-    animation:flash 0.2s ease-in-out;
-}
+@keyframes particleFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
 
-@keyframes flash{
-    0%,100%{background:transparent}
-    50%{background:rgba(255,0,0,0.3)}
-}
+.flash{animation:flash 0.2s ease-in-out}
 
-/* Victory Effects */
-@keyframes victoryPulse{
-    0%,100%{transform:scale(1);text-shadow:0 0 10px #00ff00}
-    50%{transform:scale(1.05);text-shadow:0 0 20px #00ff00,0 0 30px #00ff00}
-}
+@keyframes flash{0%,100%{background:transparent}50%{background:rgba(255,0,0,0.3)}}
 
-#victory-screen h1{
-    animation:victoryPulse 1s ease-in-out infinite;
-}
+@keyframes victoryPulse{0%,100%{transform:scale(1);text-shadow:0 0 10px #00ff00}50%{transform:scale(1.05);text-shadow:0 0 20px #00ff00,0 0 30px #00ff00}}
 
-@keyframes goalGlow{
-    0%,100%{box-shadow:0 0 10px #00ff00}
-    50%{box-shadow:0 0 20px #00ff00,0 0 30px #00ff00}
-}
+#victory-screen h1{animation:victoryPulse 1s ease-in-out infinite}
 
-/* Game Canvas Styling */
-#gameCanvas{
-    background:#1a1a1a !important;
-    display:block;
-    margin:0 auto;
-    border:2px solid #333;
-}
+@keyframes goalGlow{0%,100%{box-shadow:0 0 10px #00ff00}50%{box-shadow:0 0 20px #00ff00,0 0 30px #00ff00}}
 
-/* Platform Colors */
+#gameCanvas{background:#1a1a1a !important;display:block;margin:0 auto;border:2px solid #333}
+
 .platform{background:#555 !important}
+
 .spike{background:#cc0000 !important}
+
 .moving-platform{background:#777 !important}
 
-.goal-indicator{
-    position:absolute;
-    top:20px;
-    right:20px;
-    background:rgba(0,255,0,0.2);
-    border:2px solid #00ff00;
-    padding:8px 12px;
-    border-radius:4px;
-    color:#00ff00;
-    font-weight:bold;
-    z-index:100;
-}
-
-/* Button Styling */
-button{
-    transition:all 0.3s ease;
-    cursor:pointer;
-}
-
-button:active{
-    transform:translateY(1px);
-}
-
-/* Responsive Text */
-@media (max-width:640px){
-    #deaths-counter,#time-counter{
-        font-size:0.75rem;
-    }
-}
-
-/* Performance Optimization */
-*-webkit-transform:translateZ(0);
-transform:translateZ(0);
-
-/* General Transform */
-*{
-    transition:transform 0.1s ease;
-}
-
-/* Mobile controls responsiveness on very small screens */
-@media (max-width: 320px) {
-    #mobile-controls {
-        bottom: 12px !important;
-        left: 8px !important;
-        right: 8px !important;
-    }
-    
-    .mobile-btn {
-        width: 50px !important;
-        height: 50px !important;
-        min-width: 45px !important;
-        min-height: 45px !important;
-    }
-    
-    .jump-btn {
-        width: 60px !important;
-        height: 60px !important;
-        min-width: 55px !important;
-        min-height: 55px !important;
-    }
-    
-    #mobile-controls button i {
-        width: 20px !important;
-        height: 20px !important;
-    }
-    
-    .jump-btn i {
-        width: 24px !important;
-        height: 24px !important;
-    }
-}
-
-/* CRITICAL: Ensure mobile controls are NEVER hidden */
-@media (min-width: 641px) {
-    /* Desktop: Show mobile controls too for mouse/touch */
-    #mobile-controls {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-}
-
-/* Force visibility of all interactive elements */
-#mobile-controls,
-.mobile-btn,
-#left-btn,
-#right-btn,
-#jump-btn {
-    visibility: visible !important;
-    opacity: 1 !important;
-    display: flex !important;
-    pointer-events: auto !important;
-}
+.goal-indicator{position:absolute;top:20px;right:20px;background:rgba(0,255,0,0.2);border:2px solid #00ff00;padding:8px 12px;border-radius:4px;color:#00ff00;font-weight:bold;z-index:100}
